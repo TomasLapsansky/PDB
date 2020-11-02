@@ -1,0 +1,21 @@
+version: '3.2'
+
+services:
+  mariadb:
+    image: mariadb:10.1.44
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_DATABASE=pdbSql
+      - MYSQL_USER=pdbSql
+      - MYSQL_PASSWORD=pdbSql
+
+  cassandra:
+    image: cassandra
+    ports:
+      - 9042:9042
+    environment:
+      - CASSANDRA_USER=pdbCass
+      - CASANDRA_PASSWORD=pdbCass
+      
