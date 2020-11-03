@@ -14,3 +14,6 @@
 - [x] setup demo application
 
 ### IDE configs
+
+![project structure](https://github.com/TomasLapsansky/PDB/blob/main/img/project_structure.png)
+![run configuration](https://github.com/TomasLapsansky/PDB/blob/main/img/run_config.png)
