@@ -9,6 +9,7 @@
 ## TODO list
 - [x] setup relational database (RDB)
 - [x] create tables in RDB
+- [ ] indexes in RDB?
 - [ ] create sample data for RDB
 - [ ] create tables in Cassandra
 - [x] setup demo application
