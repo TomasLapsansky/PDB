@@ -11,7 +11,7 @@
 - [x] create tables in RDB
 - [ ] indexes in RDB?
 - [ ] create sample data for RDB
-- [ ] create tables in Cassandra
+- [x] create tables in Cassandra
 - [x] setup demo application
 
 ### IDE configs
