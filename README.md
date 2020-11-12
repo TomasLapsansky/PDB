@@ -14,6 +14,7 @@
 - [x] create tables in Cassandra
 - [x] setup demo application
 - [ ] consider adding Name (and Surname) as primary keys in case of searching ? or somehow solve searching by name ?
+- [ ] profile URL translation to email for searching ?
 
 ### IDE configs
 
