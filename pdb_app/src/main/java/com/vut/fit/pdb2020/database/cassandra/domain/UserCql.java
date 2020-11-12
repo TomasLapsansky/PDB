@@ -4,6 +4,7 @@ import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
 import java.time.Instant;
+import java.util.List;
 
 @Table("user")
 public class UserCql {
@@ -22,13 +23,15 @@ public class UserCql {
 
     private Instant last_active;
 
+    private List<Long> owned_pages;
+
     private Boolean status;
 
     private Instant created_at;
 
     public UserCql() {}
 
-    public UserCql(String email, String name, String surname, String password_hash, String profile_path, String profile_photo_path, Instant last_active, Boolean status, Instant created_at) {
+    public UserCql(String email, String name, String surname, String password_hash, String profile_path, String profile_photo_path, Instant last_active, List<Long> owned_pages, Boolean status, Instant created_at) {
         this.email = email;
         this.name = name;
         this.surname = surname;
@@ -36,6 +39,7 @@ public class UserCql {
         this.profile_path = profile_path;
         this.profile_photo_path = profile_photo_path;
         this.last_active = last_active;
+        this.owned_pages = owned_pages;
         this.status = status;
         this.created_at = created_at;
     }
@@ -110,5 +114,13 @@ public class UserCql {
 
     public void setCreated_at(Instant created_at) {
         this.created_at = created_at;
+    }
+
+    public List<Long> getOwned_pages() {
+        return owned_pages;
+    }
+
+    public void setOwned_pages(List<Long> owned_pages) {
+        this.owned_pages = owned_pages;
     }
 }

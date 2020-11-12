@@ -7,9 +7,9 @@ import java.io.Serializable;
 import java.time.Instant;
 
 @Entity
-@Table(name = "photo")
-@Where(clause="deleted=0")
-public class PhotoSql implements Serializable {
+@Table(name = "profile_link_dictionary")
+@Where(clause = "deleted=0")
+public class ProfileDictionarySql implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,12 +20,12 @@ public class PhotoSql implements Serializable {
     private String path;
 
     @OneToOne
-    @JoinColumn(name = "user_id")
-    private UserSql user;
-
-    @OneToOne
     @JoinColumn(name = "page_id")
     private PageSql page;
+
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private UserSql user;
 
     @Column
     private Instant created_at;
@@ -36,7 +36,7 @@ public class PhotoSql implements Serializable {
     @Column
     private Boolean deleted;
 
-    public PhotoSql() {
+    public ProfileDictionarySql() {
         this.deleted = false;
     }
 
@@ -54,6 +54,14 @@ public class PhotoSql implements Serializable {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public PageSql getPage() {
+        return page;
+    }
+
+    public void setPage(PageSql page) {
+        this.page = page;
     }
 
     public UserSql getUser() {
@@ -86,13 +94,5 @@ public class PhotoSql implements Serializable {
 
     public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
-    }
-
-    public PageSql getPage() {
-        return page;
-    }
-
-    public void setPage(PageSql page) {
-        this.page = page;
     }
 }

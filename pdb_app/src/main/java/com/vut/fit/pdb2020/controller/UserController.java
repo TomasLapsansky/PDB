@@ -5,9 +5,11 @@ import com.vut.fit.pdb2020.database.dto.UserCreateDto;
 import com.vut.fit.pdb2020.database.dto.UserDetailDto;
 import com.vut.fit.pdb2020.database.dto.converter.UserDtoConverter;
 import com.vut.fit.pdb2020.database.mariaDB.domain.PhotoSql;
+import com.vut.fit.pdb2020.database.mariaDB.domain.UserPageSql;
 import com.vut.fit.pdb2020.database.mariaDB.domain.UserSql;
 import com.vut.fit.pdb2020.database.mariaDB.domain.WallSql;
 import com.vut.fit.pdb2020.database.mariaDB.repository.PhotoSqlRepository;
+import com.vut.fit.pdb2020.database.mariaDB.repository.UserPageSqlRepository;
 import com.vut.fit.pdb2020.database.mariaDB.repository.WallSqlRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,8 @@ import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class UserController {
@@ -47,6 +51,9 @@ public class UserController {
 
     @Autowired
     private UserDtoConverter userDtoConverter;
+
+    @Autowired
+    UserPageSqlRepository userPageSqlRepository;
 
     @Autowired
     private ServletContext context;
@@ -202,6 +209,9 @@ public class UserController {
                 if (!passwordEncoder.matches(password, userSql.getPassword_hash()))
                     throw new Exception();
 
+                List<UserPageSql> ownedPages = userPageSqlRepository.findUserPageSqlByUser(userSql);
+                List<Long> ownedPagesIds = ownedPages.stream().map((item) -> item.getPage().getId()).collect(Collectors.toList());
+
                 userCql = new UserCql(
                         userSql.getEmail(),
                         userSql.getName(),
@@ -210,6 +220,7 @@ public class UserController {
                         userSql.getProfilePath(),
                         userSql.getProfilePhoto().getPath(),
                         Instant.now(),
+                        ownedPagesIds,
                         true,
                         Instant.now()
                 );

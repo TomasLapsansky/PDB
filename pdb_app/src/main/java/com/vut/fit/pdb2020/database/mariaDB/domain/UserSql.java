@@ -1,12 +1,9 @@
 package com.vut.fit.pdb2020.database.mariaDB.domain;
 
-import org.hibernate.annotations.LazyToOne;
-import org.hibernate.annotations.ManyToAny;
 import org.hibernate.annotations.Where;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import javax.validation.constraints.Null;
 import java.io.Serializable;
 import java.time.Instant;
 

@@ -42,6 +42,43 @@
     <button id="userCreateSubmit">Submit</button>
 </form>
 
+<script>
+    $('#userCreateSubmit').click(function(e) {
+        e.preventDefault();
+        var email = $("#email").val();
+        var name = $("#name").val();
+        var surname = $("#surname").val();
+        var password = $("#password").val();
+        var gender = $("#gender").val();
+        var address = $("#address").val();
+        var city = $("#city").val();
+        var state = $("#state").val();
+
+        var data = {
+            email: email,
+            name: name,
+            surname: surname,
+            password: password,
+            gender: gender,
+            address: address,
+            city: city,
+            state: state
+        }
+
+        $.ajax({
+            method: 'post',
+            url: '/user/create',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify(data)
+        }).done(function (result) {
+           console.log(result);
+        });
+
+    });
+</script>
+
 <hr>
 
 <form class="col-md-6 col" id="userLogin" action="/user/login" method="post" enctype="multipart/form-data" target="_blank">

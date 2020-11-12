@@ -1,5 +1,7 @@
 package com.vut.fit.pdb2020.database.dto;
 
+import java.util.List;
+
 public class UserDetailDto {
 
     private String name;
@@ -12,12 +14,15 @@ public class UserDetailDto {
 
     private Boolean status;
 
-    public UserDetailDto(String name, String surname, String profilePath, String profilePhotoPath, Boolean status) {
+    private List<Long> ownedPages;
+
+    public UserDetailDto(String name, String surname, String profilePath, String profilePhotoPath, Boolean status, List<Long> ownedPages) {
         this.name = name;
         this.surname = surname;
         this.profilePath = profilePath;
         this.profilePhotoPath = profilePhotoPath;
         this.status = status;
+        this.ownedPages = ownedPages;
     }
 
     public String getName() {
@@ -59,4 +64,8 @@ public class UserDetailDto {
     public void setStatus(Boolean status) {
         this.status = status;
     }
+
+    public List<Long> getOwnedPages() { return ownedPages; }
+
+    public void setOwnedPages(List<Long> ownedPages) { this.ownedPages = ownedPages; }
 }
