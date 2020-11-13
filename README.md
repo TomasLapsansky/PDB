@@ -16,6 +16,7 @@
 - [ ] consider adding Name (and Surname) as primary keys in case of searching ? or somehow solve searching by name ?
 - [ ] profile URL translation to email for searching ?
 - [ ] modify repository methods to automatically set updated_at (is it worth our time ? :D)
+- [ ] add user profile URL translation / like in pages
 
 ### IDE configs
 
