@@ -7,17 +7,14 @@ import java.io.Serializable;
 import java.time.Instant;
 
 @Entity
-@Table(name = "photo")
+@Table(name = "user_page")
 @Where(clause="deleted=0")
-public class PhotoSql implements Serializable {
+public class UserPageSql implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", updatable = false)
     private Long id;
-
-    @Column
-    private String path;
 
     @OneToOne
     @JoinColumn(name = "user_id")
@@ -28,6 +25,9 @@ public class PhotoSql implements Serializable {
     private PageSql page;
 
     @Column
+    private Boolean is_admin;
+
+    @Column
     private Instant created_at;
 
     @Column
@@ -36,7 +36,7 @@ public class PhotoSql implements Serializable {
     @Column
     private Boolean deleted;
 
-    public PhotoSql() {
+    public UserPageSql() {
         this.deleted = false;
     }
 
@@ -48,20 +48,28 @@ public class PhotoSql implements Serializable {
         this.id = id;
     }
 
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
     public UserSql getUser() {
         return user;
     }
 
     public void setUser(UserSql user) {
         this.user = user;
+    }
+
+    public PageSql getPage() {
+        return page;
+    }
+
+    public void setPage(PageSql page) {
+        this.page = page;
+    }
+
+    public Boolean getIs_admin() {
+        return is_admin;
+    }
+
+    public void setIs_admin(Boolean is_admin) {
+        this.is_admin = is_admin;
     }
 
     public Instant getCreated_at() {
@@ -86,13 +94,5 @@ public class PhotoSql implements Serializable {
 
     public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
-    }
-
-    public PageSql getPage() {
-        return page;
-    }
-
-    public void setPage(PageSql page) {
-        this.page = page;
     }
 }

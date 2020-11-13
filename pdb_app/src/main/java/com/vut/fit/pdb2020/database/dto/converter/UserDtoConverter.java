@@ -4,17 +4,25 @@ import com.vut.fit.pdb2020.database.cassandra.domain.UserCql;
 import com.vut.fit.pdb2020.database.dto.UserCreateDto;
 import com.vut.fit.pdb2020.database.dto.UserDetailDto;
 import com.vut.fit.pdb2020.database.mariaDB.domain.StateSql;
+import com.vut.fit.pdb2020.database.mariaDB.domain.UserPageSql;
 import com.vut.fit.pdb2020.database.mariaDB.domain.UserSql;
 import com.vut.fit.pdb2020.database.mariaDB.repository.StateSqlRepository;
+import com.vut.fit.pdb2020.database.mariaDB.repository.UserPageSqlRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class UserDtoConverter {
 
     @Autowired
     private StateSqlRepository stateSqlRepository;
+
+    @Autowired
+    UserPageSqlRepository userPageSqlRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -63,12 +71,16 @@ public class UserDtoConverter {
         UserDetailDto userDetailDto = null;
 
         if (userSql != null) {
+            List<UserPageSql> ownedPages = userPageSqlRepository.findUserPageSqlByUser(userSql);
+            List<Long> ownedPagesIds = ownedPages.stream().map((item) -> item.getPage().getId()).collect(Collectors.toList());
+
             userDetailDto = new UserDetailDto(
                 userSql.getName(),
                 userSql.getSurname(),
                 userSql.getProfilePath(),
                 userSql.getProfilePhotoPath(),
-                false //set to false because user withdrawn from source of truth, thus inactive for more than 2w
+                false, //set to false because user withdrawn from source of truth, thus inactive for more than 2w
+                    ownedPagesIds
             );
         }
 
@@ -85,7 +97,8 @@ public class UserDtoConverter {
                     userCql.getSurname(),
                     userCql.getProfile_path(),
                     userCql.getProfile_photo_path(),
-                    userCql.getStatus()
+                    userCql.getStatus(),
+                    userCql.getOwned_pages()
             );
         }
 
