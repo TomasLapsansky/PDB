@@ -1,30 +1,27 @@
 package com.vut.fit.pdb2020.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vut.fit.pdb2020.database.cassandra.domain.ProfileDictionaryCql;
+import com.vut.fit.pdb2020.database.cassandra.repository.ProfileDictionaryRepository;
 import com.vut.fit.pdb2020.database.dto.UserCreateDto;
 import com.vut.fit.pdb2020.database.dto.UserDetailDto;
 import com.vut.fit.pdb2020.database.dto.converter.UserDtoConverter;
-import com.vut.fit.pdb2020.database.mariaDB.domain.PhotoSql;
-import com.vut.fit.pdb2020.database.mariaDB.domain.UserPageSql;
-import com.vut.fit.pdb2020.database.mariaDB.domain.UserSql;
-import com.vut.fit.pdb2020.database.mariaDB.domain.WallSql;
-import com.vut.fit.pdb2020.database.mariaDB.repository.PhotoSqlRepository;
-import com.vut.fit.pdb2020.database.mariaDB.repository.UserPageSqlRepository;
-import com.vut.fit.pdb2020.database.mariaDB.repository.WallSqlRepository;
-import org.apache.commons.lang3.StringUtils;
+import com.vut.fit.pdb2020.database.mariaDB.domain.*;
+import com.vut.fit.pdb2020.database.mariaDB.repository.*;
+import com.vut.fit.pdb2020.utils.FileUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import com.vut.fit.pdb2020.database.cassandra.domain.UserCql;
 
-import com.vut.fit.pdb2020.database.mariaDB.repository.UserSqlRepository;
 import com.vut.fit.pdb2020.database.cassandra.repository.UserRepository;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletContext;
+import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,9 +53,16 @@ public class UserController {
     UserPageSqlRepository userPageSqlRepository;
 
     @Autowired
-    private ServletContext context;
+    ProfileDictionaryRepository profileDictionaryRepository;
+
+    @Autowired
+    ProfileDictionarySqlRepository profileDictionarySqlRepository;
+
+    @Autowired
+    FileUtility fileUtility;
 
 
+    @Transactional
     @PostMapping("/user/create")
     public String createUser(@RequestBody String userJson) throws Exception {
 
@@ -78,6 +82,11 @@ public class UserController {
             wallSql = wallSqlRepository.save(wallSql);
             userSql.setWall(wallSql);
             repositoryMar.save(userSql);
+
+            ProfileDictionarySql profileDictionarySql = new ProfileDictionarySql();
+            profileDictionarySql.setUser(userSql);
+            profileDictionarySql.setPath(userSql.getProfilePath());
+            profileDictionarySqlRepository.save(profileDictionarySql);
         }
         catch (Exception e) {
             System.out.println(e.toString());
@@ -93,12 +102,20 @@ public class UserController {
         UserCql userCql = repositoryCass.findByEmail(email);
 
         if (userCql != null) {
+            ProfileDictionaryCql profileDictionaryCql = profileDictionaryRepository.findByPath(userCql.getProfile_path());
+            if (profileDictionaryCql != null)
+                profileDictionaryRepository.delete(profileDictionaryCql);
+
             repositoryCass.delete(userCql);
         }
 
         UserSql userSql = repositoryMar.findByEmail(email);
 
         if (userSql != null) {
+            ProfileDictionarySql profileDictionarySql = profileDictionarySqlRepository.findByPath(userSql.getProfilePath());
+            profileDictionarySql.setDeleted(true);
+            profileDictionarySqlRepository.save(profileDictionarySql);
+
             userSql.setDeleted(true);
             userSql.setUpdated_at(Instant.now());
             repositoryMar.save(userSql);
@@ -118,24 +135,13 @@ public class UserController {
         UserSql userSql = repositoryMar.findByEmail(email);
         assert userSql != null;
 
-        String uploadsDir = "/uploads/";
-        String realPathtoUploads = context.getRealPath(uploadsDir);
-
-        if (!new File(realPathtoUploads).exists()) {
-            new File(realPathtoUploads).mkdir();
-        }
-
-        // generate unique new name for file using users email and current time
-        String randomFilename = passwordEncoder.encode(userSql.getEmail().concat(Instant.now().toString()));
-        // remove non-alphabetical characters and take last 15 characters as filename
-        String orgName = StringUtils.right(randomFilename.replaceAll("[^a-zA-Z]", ""), 15);
-        String filePath = realPathtoUploads + orgName;
-        File dest = new File(filePath);
-        file.transferTo(dest);
+       File dest = fileUtility.saveFile(file, null, email);
 
         PhotoSql photoSql = new PhotoSql();
 
-        photoSql.setPath(uploadsDir.concat(orgName));
+        String filePath = fileUtility.uploadsDir.concat(dest.getName());
+
+        photoSql.setPath(filePath);
         photoSql.setUser(userSql);
         photoSql = photoSqlRepository.save(photoSql);
 
@@ -182,6 +188,18 @@ public class UserController {
 
     }
 
+    protected void createProfileDictionaryCql(UserCql userCql) {
+
+        ProfileDictionaryCql profileDictionaryCql = profileDictionaryRepository.findByPath(userCql.getProfile_path());
+        if (profileDictionaryCql == null) {
+            profileDictionaryCql = new ProfileDictionaryCql();
+            profileDictionaryCql.setProfile_path(userCql.getProfile_path());
+            profileDictionaryCql.setUser_email(userCql.getEmail());
+            profileDictionaryRepository.save(profileDictionaryCql);
+        }
+
+    }
+
     @PostMapping("/user/login")
     public String userLogin(@RequestParam String email, @RequestParam String password) throws Exception {
 
@@ -193,6 +211,8 @@ public class UserController {
 
             userCql.setLast_active(Instant.now());
             userCql.setStatus(true);
+
+            this.createProfileDictionaryCql(userCql);
 
             try {
                 repositoryCass.save(userCql);
@@ -218,12 +238,14 @@ public class UserController {
                         userSql.getSurname(),
                         userSql.getPassword_hash(),
                         userSql.getProfilePath(),
-                        userSql.getProfilePhoto().getPath(),
+                        userSql.getProfilePhotoPath(),
                         Instant.now(),
                         ownedPagesIds,
                         true,
                         Instant.now()
                 );
+
+                this.createProfileDictionaryCql(userCql);
 
                 try {
                     repositoryCass.save(userCql);
@@ -253,24 +275,52 @@ public class UserController {
         return "Logged out";
     }
 
-    @GetMapping("/user")
-    public UserDetailDto getUser(@RequestParam String email) throws Exception {
+    @Transactional
+    @GetMapping("/user/{profileSlug}")
+    public UserDetailDto getUserProfile(@PathVariable String profileSlug) {
 
-        assert email != null;
+        assert profileSlug != null;
 
-        UserCql userCql = repositoryCass.findByEmail(email);
+        String email;
+        String profilePath = "/profile/".concat(profileSlug);
+
+        ProfileDictionaryCql profileDictionaryCql = profileDictionaryRepository.findByPath(profilePath);
+
+        if (profileDictionaryCql != null) {
+            email = profileDictionaryCql.getUser_email();
+        }
+        else {
+            ProfileDictionarySql profileDictionary = profileDictionarySqlRepository.findByPath(profilePath);
+            email = profileDictionary.getUser().getEmail();
+        }
 
         UserDetailDto userDetailDto = null;
+        UserCql userCql = repositoryCass.findByEmail(email);
 
-        if (userCql == null) {
-            UserSql userSql = repositoryMar.findByEmail(email);
-            if (userSql == null)
-                throw new Exception("User not found in source of truth");
+        if (userCql != null) {
+            userDetailDto = userDtoConverter.userCqlToDetail(userCql);
 
-            userDetailDto = userDtoConverter.userSqlToDetail(userSql);
 
         }else {
-            userDetailDto = userDtoConverter.userCqlToDetail(userCql);
+            UserSql userSql = repositoryMar.findByEmail(email);
+            assert userSql != null;
+
+            userCql = new UserCql();
+
+            List<UserPageSql> ownedPages = userPageSqlRepository.findUserPageSqlByUser(userSql);
+            List<Long> ownedPagesIds = ownedPages.stream().map((item) -> item.getPage().getId()).collect(Collectors.toList());
+
+            userCql.setName(userSql.getName());
+            userCql.setSurname(userSql.getSurname());
+            userCql.setEmail(userSql.getEmail());
+            userCql.setProfile_photo_path(userCql.getProfile_photo_path());
+            userCql.setProfile_path(userSql.getProfilePath());
+            userCql.setPassword_hash(userSql.getPassword_hash());
+            userCql.setOwned_pages(ownedPagesIds);
+            userCql.setStatus(false);
+            userCql.setCreated_at(Instant.now());
+
+            userDetailDto = userDtoConverter.userSqlToDetail(userSql);
         }
 
         return userDetailDto;

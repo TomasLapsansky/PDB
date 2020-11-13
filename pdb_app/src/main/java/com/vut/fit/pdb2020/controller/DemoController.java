@@ -16,4 +16,7 @@ public class DemoController {
         return "page";
     }
 
+    @GetMapping("/demo/post")
+    public String post() { return "post"; }
+
 }
