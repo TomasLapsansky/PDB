@@ -1,202 +1,246 @@
-SET FOREIGN_KEY_CHECKS=0;
-drop table if exists wall cascade ;
-drop table if exists user cascade ;
-drop table if exists user_page cascade ;
-drop table if exists state cascade ;
-drop table if exists page cascade ;
-drop table if exists photo cascade ;
-drop table if exists post cascade ;
-drop table if exists post_like cascade ;
-drop table if exists comment_like cascade ;
-drop table if exists comment cascade ;
-drop table if exists subscribed_to cascade ;
-drop table if exists chat cascade ;
-drop table if exists user_chat cascade ;
-drop table if exists message cascade ;
-
-CREATE TABLE state
+create or replace table chat
 (
-    id int auto_increment primary key ,
-    name varchar(64) not null ,
-    created_at timestamp default CURRENT_TIMESTAMP,
-    updated_at timestamp default CURRENT_TIMESTAMP,
-    deleted bool default false
+    id         bigint auto_increment
+        primary key,
+    name       varchar(32)                            null,
+    created_at timestamp  default current_timestamp() not null,
+    updated_at timestamp  default current_timestamp() not null,
+    deleted    tinyint(1) default 0                   null
 );
 
-INSERT INTO state (name) VALUES ('Slovak republic'), ('Czech republic'), ('Austria'), ('Germany'), ('Poland'), ('Hungary');
-
-CREATE TABLE wall
+create or replace table state
 (
-    id bigint auto_increment primary key ,
-    created_at timestamp default CURRENT_TIMESTAMP,
-    updated_at timestamp default CURRENT_TIMESTAMP,
-    deleted bool default false
+    id         int auto_increment
+        primary key,
+    name       varchar(64)                            not null,
+    created_at timestamp  default current_timestamp() not null,
+    updated_at timestamp  default current_timestamp() not null,
+    deleted    tinyint(1) default 0                   null
 );
 
-CREATE TABLE photo
+create or replace table wall
 (
-    id bigint auto_increment primary key ,
-    path varchar(256) not null ,
-    user_id bigint not null ,
-    page_id bigint not null ,
-    created_at timestamp default CURRENT_TIMESTAMP,
-    updated_at timestamp default CURRENT_TIMESTAMP,
-    deleted bool default false
+    id         bigint auto_increment
+        primary key,
+    created_at timestamp  default current_timestamp() not null,
+    updated_at timestamp  default current_timestamp() not null,
+    deleted    tinyint(1) default 0                   null
+);
+
+create or replace table page
+(
+    id               bigint auto_increment
+        primary key,
+    name             varchar(32)                            not null,
+    admin_id         bigint                                 not null,
+    profile_photo_id bigint                                 null,
+    wall_id          bigint                                 not null,
+    created_at       timestamp  default current_timestamp() not null,
+    updated_at       timestamp  default current_timestamp() not null,
+    deleted          tinyint(1) default 0                   null,
+    constraint fk_page_wall_id
+        foreign key (wall_id) references wall (id)
+);
+
+create or replace table photo
+(
+    id         bigint auto_increment
+        primary key,
+    path       varchar(256)                           not null,
+    user_id    bigint                                 not null,
+    page_id    bigint                                 not null,
+    created_at timestamp  default current_timestamp() not null,
+    updated_at timestamp  default current_timestamp() not null,
+    deleted    tinyint(1) default 0                   null,
+    constraint fk_photo_page_id
+        foreign key (page_id) references page (id)
+);
+
+alter table page
+    add constraint fk_page_profile_photo_id
+        foreign key (profile_photo_id) references photo (id);
+
+create or replace table user
+(
+    id               bigint auto_increment
+        primary key,
+    name             varchar(32)                            not null,
+    surname          varchar(32)                            not null,
+    email            varchar(64)                            not null,
+    password_hash    varchar(60)                            not null,
+    profile_photo_id bigint                                 null,
+    gender           enum ('M', 'F')                        not null,
+    address          varchar(64)                            null,
+    city             varchar(32)                            null,
+    state_id         int                                    null,
+    wall_id          bigint                                 not null,
+    created_at       timestamp  default current_timestamp() not null,
+    updated_at       timestamp  default current_timestamp() not null,
+    deleted          tinyint(1) default 0                   null,
+    constraint fk_user_profile_photo_id
+        foreign key (profile_photo_id) references photo (id),
+    constraint fk_user_state_id
+        foreign key (state_id) references state (id),
+    constraint fk_user_wall_id
+        foreign key (wall_id) references wall (id)
+);
+
+create or replace table message
+(
+    id         bigint auto_increment
+        primary key,
+    content    text                                   not null,
+    author_id  bigint                                 not null,
+    chat_id    bigint                                 not null,
+    created_at timestamp  default current_timestamp() not null,
+    updated_at timestamp  default current_timestamp() not null,
+    deleted    tinyint(1) default 0                   null,
+    constraint fk_message_author_id
+        foreign key (author_id) references user (id),
+    constraint fk_message_chat_id
+        foreign key (chat_id) references chat (id)
+);
+
+alter table page
+    add constraint fk_page_admin_id
+        foreign key (admin_id) references user (id);
+
+alter table photo
+    add constraint fk_photo_user_id
+        foreign key (user_id) references user (id);
+
+create or replace table post
+(
+    id           bigint auto_increment
+        primary key,
+    content_type enum ('text', 'image')                 not null,
+    content      text                                   not null,
+    user_id      bigint                                 null,
+    page_id      bigint                                 null,
+    wall_id      bigint                                 null,
+    created_at   timestamp  default current_timestamp() not null,
+    updated_at   timestamp  default current_timestamp() not null,
+    deleted      tinyint(1) default 0                   null,
+    constraint fk_post_page_id
+        foreign key (page_id) references page (id),
+    constraint fk_post_user_id
+        foreign key (user_id) references user (id),
+    constraint fk_post_wall_id
+        foreign key (wall_id) references wall (id)
+);
+
+create or replace table comment
+(
+    id         bigint auto_increment
+        primary key,
+    content    text                                   not null,
+    user_id    bigint                                 not null,
+    page_id    bigint                                 not null,
+    post_id    bigint                                 not null,
+    created_at timestamp  default current_timestamp() not null,
+    updated_at timestamp  default current_timestamp() not null,
+    deleted    tinyint(1) default 0                   null,
+    constraint fk_comment_page_id
+        foreign key (page_id) references page (id),
+    constraint fk_comment_post_id
+        foreign key (post_id) references post (id),
+    constraint fk_comment_user_id
+        foreign key (user_id) references user (id)
+);
+
+create or replace table comment_like
+(
+    id         bigint auto_increment
+        primary key,
+    user_id    bigint                                 not null,
+    comment_id bigint                                 not null,
+    created_at timestamp  default current_timestamp() not null,
+    updated_at timestamp  default current_timestamp() not null,
+    deleted    tinyint(1) default 0                   null,
+    constraint fk_comment_like_comment_id
+        foreign key (comment_id) references comment (id),
+    constraint fk_comment_like_user_id
+        foreign key (user_id) references user (id)
+);
+
+create or replace table post_like
+(
+    id         bigint auto_increment
+        primary key,
+    user_id    bigint                                 not null,
+    post_id    bigint                                 not null,
+    created_at timestamp  default current_timestamp() not null,
+    updated_at timestamp  default current_timestamp() not null,
+    deleted    tinyint(1) default 0                   null,
+    constraint fk_post_like_post_id
+        foreign key (post_id) references post (id),
+    constraint fk_post_like_user_id
+        foreign key (user_id) references user (id)
+);
+
+create or replace table profile_link_dictionary
+(
+    id         bigint auto_increment
+        primary key,
+    path       varchar(128)                           not null,
+    page_id    bigint                                 null,
+    user_id    bigint                                 null,
+    created_at timestamp  default current_timestamp() not null,
+    updated_at timestamp  default current_timestamp() not null,
+    deleted    tinyint(1) default 0                   null,
+    constraint fk_pld_page_id
+        foreign key (page_id) references page (id),
+    constraint fk_pld_user_id
+        foreign key (user_id) references user (id)
+);
+
+create or replace table subscribed_to
+(
+    id                 bigint auto_increment
+        primary key,
+    subscriber_id      bigint                                 not null,
+    subscribed_to_user bigint                                 not null,
+    subscribed_to_page bigint                                 not null,
+    created_at         timestamp  default current_timestamp() not null,
+    updated_at         timestamp  default current_timestamp() not null,
+    deleted            tinyint(1) default 0                   null,
+    constraint fk_subscribed_to_subscribed_to_page
+        foreign key (subscribed_to_page) references page (id),
+    constraint fk_subscribed_to_subscribed_to_user
+        foreign key (subscribed_to_user) references user (id),
+    constraint fk_subscribed_to_subscriber_id
+        foreign key (subscriber_id) references user (id)
+);
+
+create or replace table user_chat
+(
+    id         bigint auto_increment
+        primary key,
+    user_id    bigint                                 not null,
+    chat_id    bigint                                 not null,
+    created_at timestamp  default current_timestamp() not null,
+    updated_at timestamp  default current_timestamp() not null,
+    deleted    tinyint(1) default 0                   null,
+    constraint fk_user_chat_chat_id
+        foreign key (chat_id) references chat (id),
+    constraint fk_user_chat_user_id
+        foreign key (user_id) references user (id)
+);
+
+create or replace table user_page
+(
+    id         bigint auto_increment
+        primary key,
+    user_id    bigint                                 not null,
+    page_id    bigint                                 not null,
+    is_admin   tinyint(1) default 1                   null,
+    created_at timestamp  default current_timestamp() not null,
+    updated_at timestamp  default current_timestamp() not null,
+    deleted    tinyint(1) default 0                   null,
+    constraint fk_user_page_page_id
+        foreign key (page_id) references page (id),
+    constraint fk_user_page_user_id
+        foreign key (user_id) references user (id)
 );
 
 
-
-CREATE TABLE user
-(
-    id bigint auto_increment primary key ,
-    name varchar(32) not null ,
-    surname varchar(32) not null ,
-    email varchar(64) not null ,
-    password_hash char(60) not null ,
-    profile_photo_id bigint,
-    gender enum('M', 'F') not null ,
-    address varchar(64),
-    city varchar(32),
-    state_id int,
-    wall_id bigint not null,
-    created_at timestamp default CURRENT_TIMESTAMP,
-    updated_at timestamp default CURRENT_TIMESTAMP,
-    deleted bool default false,
-    CONSTRAINT fk_user_wall_id FOREIGN KEY (wall_id) REFERENCES wall (id),
-    CONSTRAINT fk_user_state_id FOREIGN KEY (state_id) REFERENCES state (id),
-    CONSTRAINT fk_user_profile_photo_id FOREIGN KEY (profile_photo_id) REFERENCES photo (id)
-);
-
-CREATE TABLE page
-(
-    id bigint auto_increment primary key ,
-    name varchar(32) not null ,
-    admin_id bigint not null ,
-    profile_photo_id bigint,
-    wall_id bigint not null ,
-    created_at timestamp default CURRENT_TIMESTAMP,
-    updated_at timestamp default CURRENT_TIMESTAMP,
-    deleted bool default false,
-    CONSTRAINT fk_page_admin_id FOREIGN KEY (admin_id) REFERENCES user (id),
-    CONSTRAINT fk_page_profile_photo_id FOREIGN KEY (profile_photo_id) REFERENCES photo (id),
-    CONSTRAINT fk_page_wall_id FOREIGN KEY (wall_id) REFERENCES wall (id)
-);
-
-ALTER TABLE photo ADD CONSTRAINT fk_photo_user_id FOREIGN KEY (user_id) REFERENCES user (id);
-ALTER TABLE photo ADD CONSTRAINT fk_photo_page_id FOREIGN KEY (page_id) REFERENCES page (id);
-
-CREATE TABLE user_page
-(
-    id bigint auto_increment primary key ,
-    user_id bigint not null ,
-    page_id bigint not null ,
-    is_admin bool default true,
-    created_at timestamp default CURRENT_TIMESTAMP,
-    updated_at timestamp default CURRENT_TIMESTAMP,
-    deleted bool default false,
-    CONSTRAINT fk_user_page_user_id FOREIGN KEY (user_id) REFERENCES user (id),
-    CONSTRAINT fk_user_page_page_id FOREIGN KEY (page_id) REFERENCES page (id)
-);
-
-CREATE TABLE post
-(
-    id bigint auto_increment primary key ,
-    content_type enum('text', 'image') not null ,
-    content text not null ,
-    user_id bigint,
-    page_id bigint,
-    wall_id bigint,
-    created_at timestamp default CURRENT_TIMESTAMP,
-    updated_at timestamp default CURRENT_TIMESTAMP,
-    deleted bool default false,
-    CONSTRAINT fk_post_user_id FOREIGN KEY (user_id) REFERENCES user (id),
-    CONSTRAINT fk_post_page_id FOREIGN KEY (page_id) REFERENCES page (id),
-    CONSTRAINT fk_post_wall_id FOREIGN KEY (wall_id) REFERENCES wall (id)
-);
-
-CREATE TABLE subscribed_to
-(
-    id bigint auto_increment primary key ,
-    subscriber_id bigint not null ,
-    subscribed_to_user bigint not null ,
-    subscribed_to_page bigint not null ,
-    created_at timestamp default CURRENT_TIMESTAMP,
-    updated_at timestamp default CURRENT_TIMESTAMP,
-    deleted bool default false,
-    CONSTRAINT fk_subscribed_to_subscriber_id FOREIGN KEY (subscriber_id) REFERENCES user (id),
-    CONSTRAINT fk_subscribed_to_subscribed_to_user FOREIGN KEY (subscribed_to_user) REFERENCES user (id),
-    CONSTRAINT fk_subscribed_to_subscribed_to_page FOREIGN KEY (subscribed_to_page) REFERENCES page (id)
-);
-
-CREATE TABLE chat
-(
-  id bigint auto_increment primary key ,
-  name varchar(32),
-  created_at timestamp default CURRENT_TIMESTAMP,
-  updated_at timestamp default CURRENT_TIMESTAMP,
-  deleted bool default false
-);
-
-CREATE TABLE user_chat
-(
-  id bigint auto_increment primary key ,
-  user_id bigint not null ,
-  chat_id bigint not null ,
-  created_at timestamp default CURRENT_TIMESTAMP,
-  updated_at timestamp default CURRENT_TIMESTAMP,
-  deleted bool default false,
-  CONSTRAINT fk_user_chat_user_id FOREIGN KEY (user_id) REFERENCES user (id),
-  CONSTRAINT fk_user_chat_chat_id FOREIGN KEY (chat_id) REFERENCES chat (id)
-);
-
-CREATE TABLE message
-(
-    id bigint auto_increment primary key ,
-    content text not null ,
-    author_id bigint not null ,
-    chat_id bigint not null ,
-    created_at timestamp default CURRENT_TIMESTAMP,
-    updated_at timestamp default CURRENT_TIMESTAMP,
-    deleted bool default false,
-    CONSTRAINT fk_message_author_id FOREIGN KEY (author_id) REFERENCES user (id),
-    CONSTRAINT fk_message_chat_id FOREIGN KEY (chat_id) REFERENCES chat (id)
-);
-
-CREATE TABLE comment
-(
-    id bigint auto_increment primary key ,
-    content text not null ,
-    user_id bigint not null ,
-    page_id bigint not null ,
-    post_id bigint not null ,
-    created_at timestamp default CURRENT_TIMESTAMP,
-    updated_at timestamp default CURRENT_TIMESTAMP,
-    deleted bool default false,
-    CONSTRAINT fk_comment_user_id FOREIGN KEY (user_id) REFERENCES user (id),
-    CONSTRAINT fk_comment_page_id FOREIGN KEY (page_id) REFERENCES page (id),
-    CONSTRAINT fk_comment_post_id FOREIGN KEY (post_id) REFERENCES post (id)
-);
-
-CREATE TABLE comment_like
-(
-    id bigint auto_increment primary key ,
-    user_id bigint not null ,
-    comment_id bigint not null ,
-    created_at timestamp default CURRENT_TIMESTAMP,
-    updated_at timestamp default CURRENT_TIMESTAMP,
-    deleted bool default false,
-    CONSTRAINT fk_comment_like_user_id FOREIGN KEY (user_id) REFERENCES user (id),
-    CONSTRAINT fk_comment_like_comment_id FOREIGN KEY (comment_id) REFERENCES comment (id)
-);
-
-CREATE TABLE post_like
-(
-    id bigint auto_increment primary key ,
-    user_id bigint not null ,
-    post_id bigint not null ,
-    created_at timestamp default CURRENT_TIMESTAMP,
-    updated_at timestamp default CURRENT_TIMESTAMP,
-    deleted bool default false,
-    CONSTRAINT fk_post_like_user_id FOREIGN KEY (user_id) REFERENCES user (id),
-    CONSTRAINT fk_post_like_post_id FOREIGN KEY (post_id) REFERENCES post (id)
-);

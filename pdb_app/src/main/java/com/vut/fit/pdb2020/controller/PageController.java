@@ -10,6 +10,7 @@ import com.vut.fit.pdb2020.database.dto.PageDetailDto;
 import com.vut.fit.pdb2020.database.dto.converter.PageDtoConverter;
 import com.vut.fit.pdb2020.database.mariaDB.domain.*;
 import com.vut.fit.pdb2020.database.mariaDB.repository.*;
+import com.vut.fit.pdb2020.utils.FileUtility;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,9 +48,6 @@ public class PageController {
     UserPageSqlRepository userPageSqlRepository;
 
     @Autowired
-    private ServletContext context;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -63,6 +61,9 @@ public class PageController {
 
     @Autowired
     ProfileDictionarySqlRepository profileDictionarySqlRepository;
+
+    @Autowired
+    FileUtility fileUtility;
 
     @Transactional
     @PostMapping("/page/create")
@@ -119,7 +120,6 @@ public class PageController {
 
             userCql.setOwned_pages(newPages);
             userRepository.save(userCql);
-
 
         }
 
@@ -197,24 +197,13 @@ public class PageController {
         PageSql page = pageSqlRepository.findById(id);
         assert page != null;
 
-        String uploadsDir = "/uploads/";
-        String realPathtoUploads = context.getRealPath(uploadsDir);
-
-        if (!new File(realPathtoUploads).exists()) {
-            new File(realPathtoUploads).mkdir();
-        }
-
-        // generate unique new name for file using users email and current time
-        String randomFilename = passwordEncoder.encode(page.getId().toString().concat(Instant.now().toString()));
-        // remove non-alphabetical characters and take last 15 characters as filename
-        String orgName = StringUtils.right(randomFilename.replaceAll("[^a-zA-Z]", ""), 15);
-        String filePath = realPathtoUploads + orgName;
-        File dest = new File(filePath);
-        file.transferTo(dest);
+        File dest = fileUtility.saveFile(file, page.getId(), null);
 
         PhotoSql photoSql = new PhotoSql();
 
-        photoSql.setPath(uploadsDir.concat(orgName));
+        String filePath = fileUtility.uploadsDir.concat(dest.getName());
+
+        photoSql.setPath(filePath);
         photoSql.setPage(page);
         photoSql = photoSqlRepository.save(photoSql);
 

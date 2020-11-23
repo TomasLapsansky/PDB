@@ -16,13 +16,16 @@ public class UserDetailDto {
 
     private List<Long> ownedPages;
 
-    public UserDetailDto(String name, String surname, String profilePath, String profilePhotoPath, Boolean status, List<Long> ownedPages) {
+    private List<PostDetailDto> posts;
+
+    public UserDetailDto(String name, String surname, String profilePath, String profilePhotoPath, Boolean status, List<Long> ownedPages, List<PostDetailDto> posts) {
         this.name = name;
         this.surname = surname;
         this.profilePath = profilePath;
         this.profilePhotoPath = profilePhotoPath;
         this.status = status;
         this.ownedPages = ownedPages;
+        this.posts = posts;
     }
 
     public String getName() {
@@ -68,4 +71,12 @@ public class UserDetailDto {
     public List<Long> getOwnedPages() { return ownedPages; }
 
     public void setOwnedPages(List<Long> ownedPages) { this.ownedPages = ownedPages; }
+
+    public List<PostDetailDto> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<PostDetailDto> posts) {
+        this.posts = posts;
+    }
 }
