@@ -17,6 +17,7 @@
 - [X] profile URL translation to email for searching ?
 - [ ] modify repository methods to automatically set updated_at (is it worth our time ? :D)
 - [X] add user profile URL translation / like in pages
+- [ ] resolve problem with column names when deleting posts
 
 ### IDE configs
 
