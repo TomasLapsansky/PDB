@@ -19,6 +19,9 @@ public class DemoController {
     @GetMapping("/demo/post")
     public String post() { return "post"; }
 
+    @GetMapping("/demo/chats")
+    public String chats() { return "chats"; }
+
     @GetMapping("/demo/subscribe")
     public String subscribe() { return "subscribe"; }
 

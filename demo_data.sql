@@ -45,9 +45,14 @@ INSERT INTO pdbSql.comment (id, content, user_id, page_id, post_id, created_at, 
 INSERT INTO pdbSql.comment_like (id, user_id, comment_id, created_at, updated_at, deleted) VALUES (3, 1, 2, '2020-12-11 08:54:32', '2020-12-11 08:54:32', 0);
 INSERT INTO pdbSql.comment_like (id, user_id, comment_id, created_at, updated_at, deleted) VALUES (4, 1, 3, '2020-12-12 19:22:01', '2020-12-12 19:22:01', 0);
 
+INSERT INTO pdbSql.chat (id, name, created_at, updated_at, deleted) VALUES (1, null, '2020-12-13 10:21:18', '2020-12-13 10:21:18', 0);
+INSERT INTO pdbSql.chat (id, name, created_at, updated_at, deleted) VALUES (2, 'Group chat', '2020-12-13 10:22:53', '2020-12-13 10:22:53', 0);
 
+INSERT INTO pdbSql.user_chat (id, user_id, chat_id, created_at, updated_at, deleted) VALUES (1, 1, 1, '2020-12-13 10:21:51', '2020-12-13 10:21:51', 0);
+INSERT INTO pdbSql.user_chat (id, user_id, chat_id, created_at, updated_at, deleted) VALUES (2, 2, 1, '2020-12-13 10:21:57', '2020-12-13 10:21:57', 0);
+INSERT INTO pdbSql.user_chat (id, user_id, chat_id, created_at, updated_at, deleted) VALUES (3, 1, 2, '2020-12-13 10:23:14', '2020-12-13 10:23:14', 0);
+INSERT INTO pdbSql.user_chat (id, user_id, chat_id, created_at, updated_at, deleted) VALUES (4, 2, 2, '2020-12-13 10:23:23', '2020-12-13 10:23:23', 0);
+INSERT INTO pdbSql.user_chat (id, user_id, chat_id, created_at, updated_at, deleted) VALUES (5, 11, 2, '2020-12-13 10:23:33', '2020-12-13 10:23:33', 0);
 
-
-
-
-
+INSERT INTO pdbSql.message (id, content, author_id, chat_id, created_at, updated_at, deleted) VALUES (1, 'Message 1', 1, 1, '2020-12-13 10:22:16', '2020-12-13 10:22:16', 0);
+INSERT INTO pdbSql.message (id, content, author_id, chat_id, created_at, updated_at, deleted) VALUES (2, 'Message 2', 2, 1, '2020-12-13 10:22:36', '2020-12-13 10:22:36', 0);

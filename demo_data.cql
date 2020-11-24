@@ -29,3 +29,21 @@ INSERT INTO pdb2020.user_post (user_email, content_type, created_at, comments, c
 INSERT INTO pdb2020.user (email, created_at, last_active, name, owned_pages, password_hash, profile_path, profile_photo_path, status, surname) VALUES ('peter@sn.com', '2020-12-05 13:35:25.667', '2020-12-05 13:35:25.667', 'Peter', [1, 26, 27], '$2a$10$b2sBGNUm6zmAvQrRdQ600OZlbx0jyFpiy1OiqW1iiuLvnL.FuS.w6', '/user/petersveter.1', null, true, 'Sveter');
 INSERT INTO pdb2020.user (email, created_at, last_active, name, owned_pages, password_hash, profile_path, profile_photo_path, status, surname) VALUES ('kafka@sn.com', null, null, 'Franz', [], '$2a$10$gOK5pDHtu5P6qBJ7aORWLuWlPYD9RTSJ8FHBqE2k5qJW77MErqO/O', '/user/franzkafka.11', null, false, 'Kafka');
 INSERT INTO pdb2020.user (email, created_at, last_active, name, owned_pages, password_hash, profile_path, profile_photo_path, status, surname) VALUES ('lukas@sn.com', '2020-12-05 13:35:33.957', '2020-12-05 13:35:33.957', 'Lukas', [], '$2a$10$YIWkS15WXQvBamoJefZK5enuId2jIiNqcr5wXgG0pLbe7mcvd6uta', '/user/lukassuster.2', null, true, 'Suster');
+
+INSERT INTO pdb2020.chat (id, name, updated_at) VALUES (2, 'Group chat', '2020-12-13 10:22:53.000');
+INSERT INTO pdb2020.chat (id, name, updated_at) VALUES (1, null, '2020-12-13 10:21:18.000');
+
+INSERT INTO pdb2020.user_chat (user_email, chat_id, created_at) VALUES ('peter@sn.com', 1, '2020-12-13 10:21:51.000');
+INSERT INTO pdb2020.user_chat (user_email, chat_id, created_at) VALUES ('peter@sn.com', 2, '2020-12-13 10:23:14.000');
+INSERT INTO pdb2020.user_chat (user_email, chat_id, created_at) VALUES ('kafka@sn.com', 2, '2020-12-13 10:23:33.000');
+INSERT INTO pdb2020.user_chat (user_email, chat_id, created_at) VALUES ('lukas@sn.com', 1, '2020-12-13 10:21:57.000');
+INSERT INTO pdb2020.user_chat (user_email, chat_id, created_at) VALUES ('lukas@sn.com', 2, '2020-12-13 10:23:23.000');
+
+INSERT INTO pdb2020.chat_user (chat_id, user_email, created_at) VALUES (2, 'kafka@sn.com', '2020-12-13 10:23:33.000');
+INSERT INTO pdb2020.chat_user (chat_id, user_email, created_at) VALUES (2, 'lukas@sn.com', '2020-12-13 10:23:23.000');
+INSERT INTO pdb2020.chat_user (chat_id, user_email, created_at) VALUES (2, 'peter@sn.com', '2020-12-13 10:23:14.000');
+INSERT INTO pdb2020.chat_user (chat_id, user_email, created_at) VALUES (1, 'lukas@sn.com', '2020-12-13 10:21:57.000');
+INSERT INTO pdb2020.chat_user (chat_id, user_email, created_at) VALUES (1, 'peter@sn.com', '2020-12-13 10:21:51.000');
+
+INSERT INTO pdb2020.chat_message (chat_id, from_user, created_at, message) VALUES (1, 'lukas@sn.com', '2020-12-13 10:22:36.000', 'Message 2');
+INSERT INTO pdb2020.chat_message (chat_id, from_user, created_at, message) VALUES (1, 'peter@sn.com', '2020-12-13 10:22:16.000', 'Message 1');
