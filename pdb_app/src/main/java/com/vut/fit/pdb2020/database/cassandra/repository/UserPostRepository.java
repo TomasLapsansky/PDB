@@ -13,8 +13,5 @@ public interface UserPostRepository extends CassandraRepository<UserPostCql, Str
 
     UserPostCql findByUserEmailAndContentTypeAndCreatedAt(String user_email, String content_type, Instant created_at);
 
-    /* TODO - this shit does not work -- ?
-    @Query("delete from user_post p where p.user_email = ?1 and p.content_type = ?2 and created_at = ?3")
-    void customDelete(String user_email, String content_type, Instant created_at);
-    */
+    void deleteByUserEmailAndContentTypeAndCreatedAt(String userEmail, String contentType, Instant createdAt);
 }

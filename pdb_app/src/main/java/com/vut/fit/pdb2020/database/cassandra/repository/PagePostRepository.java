@@ -13,4 +13,6 @@ public interface PagePostRepository extends CassandraRepository<PagePostCql, Str
 
     PagePostCql findByPageIdAndContentTypeAndCreatedAt(Long page_id, String content_type, Instant created_at);
 
+    void deleteByPageIdAndContentTypeAndCreatedAt(Long pageId, String contentType, Instant createdAt);
+
 }
