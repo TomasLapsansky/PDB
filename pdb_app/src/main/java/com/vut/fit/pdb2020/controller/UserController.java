@@ -282,8 +282,9 @@ public class UserController {
         assert profileSlug != null;
 
         String email;
-        String profilePath = "/profile/".concat(profileSlug);
 
+        //TODO -> might create service for this ?
+        String profilePath = "/user/".concat(profileSlug);
         ProfileDictionaryCql profileDictionaryCql = profileDictionaryRepository.findByPath(profilePath);
 
         if (profileDictionaryCql != null) {
