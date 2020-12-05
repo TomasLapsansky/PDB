@@ -197,7 +197,7 @@ public class UserSql implements Serializable {
 
     public String getProfilePath() {
         if (profilePath == null) {
-            profilePath = String.format("/profile/%s%s.%d", name.toLowerCase(), surname.toLowerCase(), id);
+            profilePath = String.format("/user/%s%s.%d", name.toLowerCase(), surname.toLowerCase(), id);
         }
         return profilePath;
     }
