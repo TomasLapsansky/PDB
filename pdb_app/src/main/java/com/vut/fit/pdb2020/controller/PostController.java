@@ -62,12 +62,14 @@ public class PostController {
             UserSql userSql = userSqlRepository.findByEmail(email);
             assert userSql != null;
 
+            Instant createdAt = Instant.now();
+
             PostSql postSql = new PostSql();
             postSql.setUser(userSql);
             postSql.setWall(userSql.getWall());
             postSql.setContent_type(contentType);
             postSql.setContent(textContent);
-            postSql.setCreated_at(Instant.now());
+            postSql.setCreated_at(createdAt);
             postSqlRepository.save(postSql);
 
             UserCql userCql = userRepository.findByEmail(email);
@@ -78,7 +80,7 @@ public class PostController {
             userPostCql.setUser_profile_path(userCql.getProfile_path());
             userPostCql.setContent(textContent);
             userPostCql.setContent_type(contentType);
-            userPostCql.setCreated_at(Instant.now());
+            userPostCql.setCreated_at(createdAt);
             userPostRepository.save(userPostCql);
 
             return "Post successfully created";
@@ -88,7 +90,6 @@ public class PostController {
 
     }
 
-    //TODO solve cassandra delete
     @Transactional
     @PostMapping("/user/post/delete")
     public String deleteUserPost(@RequestParam String email, @RequestParam String contentType, @RequestParam String createdAt) {
@@ -100,7 +101,7 @@ public class PostController {
         if (userCql != null) {
             UserPostCql userPostCql = userPostRepository.findByUserEmailAndContentTypeAndCreatedAt(email, contentType, Instant.parse(createdAt));
             if (userPostCql != null) {
-                userPostRepository.delete(userPostCql);
+                userPostRepository.deleteByUserEmailAndContentTypeAndCreatedAt(userPostCql.getUser_email(), userPostCql.getContent_type(), userPostCql.getCreated_at());
             }
         }
 
@@ -131,12 +132,14 @@ public class PostController {
             PageSql pageSql = pageSqlRepository.findById(pageId);
             assert pageSql != null;
 
+            Instant createdAt = Instant.now();
+
             PostSql postSql = new PostSql();
             postSql.setPage(pageSql);
             postSql.setWall(pageSql.getWall());
             postSql.setContent_type(contentType);
             postSql.setContent(textContent);
-            postSql.setCreated_at(Instant.now());
+            postSql.setCreated_at(createdAt);
             postSqlRepository.save(postSql);
 
             PageCql pageCql = pageRepository.findById(pageId);
@@ -147,7 +150,7 @@ public class PostController {
             pagePostCql.setPage_name(pageCql.getName());
             pagePostCql.setContent(textContent);
             pagePostCql.setContent_type(contentType);
-            pagePostCql.setCreated_at(Instant.now());
+            pagePostCql.setCreated_at(createdAt);
             pagePostRepository.save(pagePostCql);
 
             return "Post successfully created";
@@ -157,7 +160,6 @@ public class PostController {
 
     }
 
-    // TODO - solve cassandra delete
     @Transactional
     @PostMapping("/page/post/delete")
     public String deleteUserPost(@RequestParam Long pageId, @RequestParam String contentType, @RequestParam String createdAt) {
@@ -169,7 +171,7 @@ public class PostController {
         if (pageCql != null) {
             PagePostCql pagePostCql = pagePostRepository.findByPageIdAndContentTypeAndCreatedAt(pageId, contentType, Instant.parse(createdAt));
             if (pagePostCql != null) {
-                pagePostRepository.delete(pagePostCql);
+                pagePostRepository.deleteByPageIdAndContentTypeAndCreatedAt(pagePostCql.getPage_id(), pagePostCql.getContent_type(), pagePostCql.getCreated_at());
             }
         }
 
