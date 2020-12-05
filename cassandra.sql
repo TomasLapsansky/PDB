@@ -1,3 +1,6 @@
+CREATE KEYSPACE IF NOT EXISTS pdb2020 WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 3};
+USE pdb2020;
+
 create type if not exists comment (
 	author_name text,
 	author_profile_url text,

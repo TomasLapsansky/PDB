@@ -19,4 +19,7 @@ public class DemoController {
     @GetMapping("/demo/post")
     public String post() { return "post"; }
 
+    @GetMapping("/demo/subscribe")
+    public String subscribe() { return "subscribe"; }
+
 }
