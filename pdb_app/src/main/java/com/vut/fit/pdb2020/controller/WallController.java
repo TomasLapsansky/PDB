@@ -10,6 +10,7 @@ import com.vut.fit.pdb2020.database.cassandra.repository.UserPostRepository;
 import com.vut.fit.pdb2020.database.cassandra.repository.UserRepository;
 import com.vut.fit.pdb2020.database.dto.DefaultWallDto;
 import com.vut.fit.pdb2020.database.dto.PostDetailDto;
+import com.vut.fit.pdb2020.database.dto.converter.PostDetialDtoConverter;
 import com.vut.fit.pdb2020.database.mariaDB.domain.UserSql;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class WallController {
@@ -35,6 +37,9 @@ public class WallController {
     @Autowired
     PagePostRepository pagePostRepository;
 
+    @Autowired
+    PostDetialDtoConverter postDetialDtoConverter;
+
     @GetMapping("/wall/{email}")
     public DefaultWallDto showWall(@PathVariable String email) {
 
@@ -49,25 +54,17 @@ public class WallController {
                 List<UserPostCql> posts = userPostRepository.findByUserEmailAndContentTypeOrderByCreatedAt(follower.getFollower_email(), "text");
                 posts.addAll(userPostRepository.findByUserEmailAndContentTypeOrderByCreatedAt(follower.getFollower_email(), "image"));
 
-                for (UserPostCql post : posts) {
-                    PostDetailDto postDetail = new PostDetailDto();
-                    postDetail.setContentType(post.getContent_type());
-                    postDetail.setContent(post.getContent());
-                    postDetail.setCreatedAt(post.getCreated_at());
-                    wallPosts.add(postDetail);
-                }
+                List<PostDetailDto> postDtos = posts.stream().map( post -> postDetialDtoConverter.userPostCqlToDto(post)).collect(Collectors.toList());
+                wallPosts.addAll(postDtos);
+
             }
             else if (follower.getFollower_id() != null) {
                 List<PagePostCql> posts = pagePostRepository.findByPageIdAndContentTypeOrderByCreatedAt(follower.getFollower_id(), "text");
                 posts.addAll(pagePostRepository.findByPageIdAndContentTypeOrderByCreatedAt(follower.getFollower_id(), "image"));
 
-                for (PagePostCql post : posts) {
-                    PostDetailDto postDetail = new PostDetailDto();
-                    postDetail.setContentType(post.getContent_type());
-                    postDetail.setContent(post.getContent());
-                    postDetail.setCreatedAt(post.getCreated_at());
-                    wallPosts.add(postDetail);
-                }
+                List<PostDetailDto> postDtos = posts.stream().map( post -> postDetialDtoConverter.pagePostCqlToDto(post)).collect(Collectors.toList());
+                wallPosts.addAll(postDtos);
+
             }
         }
 

@@ -1,10 +1,16 @@
 package com.vut.fit.pdb2020.database.dto.converter;
 
+import com.vut.fit.pdb2020.database.cassandra.dataTypes.Like;
 import com.vut.fit.pdb2020.database.cassandra.domain.PagePostCql;
 import com.vut.fit.pdb2020.database.cassandra.domain.UserPostCql;
 import com.vut.fit.pdb2020.database.dto.PostDetailDto;
+import com.vut.fit.pdb2020.database.dto.PostDetailLikeDto;
+import com.vut.fit.pdb2020.database.dto.PostLikeDto;
 import com.vut.fit.pdb2020.database.mariaDB.domain.PostSql;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class PostDetialDtoConverter {
@@ -18,6 +24,13 @@ public class PostDetialDtoConverter {
             postDetailDto.setContent(post.getContent());
             postDetailDto.setContentType(post.getContent_type());
             postDetailDto.setCreatedAt(post.getCreated_at());
+            List<PostDetailLikeDto> postLikes = new ArrayList<>();
+            if (post.getLikes() != null) {
+                for (Like like :  post.getLikes()) {
+                    postLikes.add(new PostDetailLikeDto(like));
+                }
+                postDetailDto.setLikes(postLikes);
+            }
         }
 
         return postDetailDto;
@@ -33,6 +46,13 @@ public class PostDetialDtoConverter {
             postDetailDto.setContent(post.getContent());
             postDetailDto.setContentType(post.getContent_type());
             postDetailDto.setCreatedAt(post.getCreated_at());
+            List<PostDetailLikeDto> postLikes = new ArrayList<>();
+            if (post.getLikes() != null) {
+                for (Like like :  post.getLikes()) {
+                    postLikes.add(new PostDetailLikeDto(like));
+                }
+                postDetailDto.setLikes(postLikes);
+            }
         }
 
         return postDetailDto;

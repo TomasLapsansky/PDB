@@ -209,4 +209,8 @@ public class UserSql implements Serializable {
         return null;
     }
 
+    public String getFullName() {
+        return String.format("%s %s", name, surname);
+    }
+
 }
