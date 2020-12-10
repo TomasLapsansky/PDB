@@ -61,5 +61,22 @@
     <button>Delete post</button>
 </form>
 
+<hr>
+
+<h3>Like post</h3>
+<form target="_blank" class="col-md-6 col" action="/post/like" method="post" enctype="multipart/form-data">
+    <label>Who likes</label>
+    <input type="text" name="likeGiverMail" >
+    <label for="emailuserPost">Page ID</label>
+    <input type="text" name="pageId" >
+    <label for="emailuserPost">User mail</label>
+    <input type="text" name="userMail">
+    <label for="pageName">Content type</label>
+    <input type="textarea" name="contentType">
+    <label>Created at</label>
+    <input type="text" name="createdAt">
+    <button id="like">Like</button>
+</form>
+
 </body>
 </html>

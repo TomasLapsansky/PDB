@@ -1,12 +1,15 @@
 package com.vut.fit.pdb2020.database.cassandra.domain;
 
 import com.datastax.oss.driver.api.core.data.UdtValue;
+import com.vut.fit.pdb2020.database.cassandra.dataTypes.Like;
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 @Table("page_post")
 public class PagePostCql {
@@ -26,7 +29,7 @@ public class PagePostCql {
 
     private List<UdtValue> comments;
 
-    private List<UdtValue> likes;
+    private List<Like> likes;
 
     @Column("created_at")
     private Instant createdAt;
@@ -71,11 +74,11 @@ public class PagePostCql {
         this.comments = comments;
     }
 
-    public List<UdtValue> getLikes() {
+    public List<Like> getLikes() {
         return likes;
     }
 
-    public void setLikes(List<UdtValue> likes) {
+    public void setLikes(List<Like> likes) {
         this.likes = likes;
     }
 
@@ -86,4 +89,8 @@ public class PagePostCql {
     public void setCreated_at(Instant created_at) {
         this.createdAt = created_at;
     }
+
+    public TreeSet<Like> getTreeLikes() { return new TreeSet<>(likes); }
+
+    public void setTreeLikes(TreeSet<Like> likes) {this.likes = new ArrayList<>(likes); }
 }
