@@ -1,19 +1,21 @@
 CREATE KEYSPACE IF NOT EXISTS pdb2020 WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 3};
 USE pdb2020;
 
+create type if not exists like (
+	ident bigint,
+	author_name text,
+	author_profile_url text,
+	author_picture_url text,
+	created_at timestamp
+);
+
 create type if not exists comment (
+	ident bigint,
 	author_name text,
 	author_profile_url text,
 	author_picture_url text,
 	content text,
 	comment_likes list<frozen<like>>,
-	created_at timestamp
-);
-
-create type if not exists like (
-	author_name text,
-	author_profile_url text,
-	author_picture_url text,
 	created_at timestamp
 );
 
@@ -24,8 +26,8 @@ create table if not exists chat
 	updated_at timestamp
 )
 with caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
-	and compaction = {'max_threshold': '32', 'min_threshold': '4', 'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy'}
-	and compression = {'class': 'org.apache.cassandra.io.compress.LZ4Compressor', 'chunk_length_in_kb': '64'}
+	and compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+	and compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
 	and dclocal_read_repair_chance = 0.1;
 
 create table if not exists chat_message
@@ -37,8 +39,8 @@ create table if not exists chat_message
 	primary key ((chat_id, from_user), created_at)
 )
 with caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
-	and compaction = {'max_threshold': '32', 'min_threshold': '4', 'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy'}
-	and compression = {'class': 'org.apache.cassandra.io.compress.LZ4Compressor', 'chunk_length_in_kb': '64'}
+	and compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+	and compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
 	and dclocal_read_repair_chance = 0.1;
 
 create table if not exists page
@@ -51,10 +53,22 @@ create table if not exists page
 	profile_photo_path text
 )
 with caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
-	and compaction = {'max_threshold': '32', 'min_threshold': '4', 'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy'}
-	and compression = {'class': 'org.apache.cassandra.io.compress.LZ4Compressor', 'chunk_length_in_kb': '64'}
+	and compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+	and compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
 	and dclocal_read_repair_chance = 0.1
 	and default_time_to_live = 1209600;
+
+create table if not exists page_follows
+(
+	follows_id bigint,
+	user_email text,
+	created_at timestamp,
+	primary key (follows_id, user_email)
+)
+with caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+	and compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+	and compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+	and dclocal_read_repair_chance = 0.1;
 
 create table if not exists page_post
 (
@@ -68,8 +82,8 @@ create table if not exists page_post
 	primary key ((page_id, content_type), created_at)
 )
 with caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
-	and compaction = {'max_threshold': '32', 'min_threshold': '4', 'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy'}
-	and compression = {'class': 'org.apache.cassandra.io.compress.LZ4Compressor', 'chunk_length_in_kb': '64'}
+	and compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+	and compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
 	and dclocal_read_repair_chance = 0.1;
 
 create table if not exists profile_link_dictionary
@@ -79,8 +93,8 @@ create table if not exists profile_link_dictionary
 	user_email text
 )
 with caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
-	and compaction = {'max_threshold': '32', 'min_threshold': '4', 'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy'}
-	and compression = {'class': 'org.apache.cassandra.io.compress.LZ4Compressor', 'chunk_length_in_kb': '64'}
+	and compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+	and compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
 	and dclocal_read_repair_chance = 0.1
 	and default_time_to_live = 1209600;
 
@@ -98,32 +112,34 @@ create table if not exists user
 	surname text
 )
 with caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
-	and compaction = {'max_threshold': '32', 'min_threshold': '4', 'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy'}
-	and compression = {'class': 'org.apache.cassandra.io.compress.LZ4Compressor', 'chunk_length_in_kb': '64'}
+	and compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+	and compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
 	and dclocal_read_repair_chance = 0.1
 	and default_time_to_live = 1209600;
 
 create table if not exists user_chat
 (
-	chat_id uuid primary key,
+	user_email text,
+	chat_id bigint,
 	created_at timestamp,
-	user_email text
+	primary key (user_email, chat_id)
 )
 with caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
-	and compaction = {'max_threshold': '32', 'min_threshold': '4', 'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy'}
-	and compression = {'class': 'org.apache.cassandra.io.compress.LZ4Compressor', 'chunk_length_in_kb': '64'}
+	and compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+	and compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
 	and dclocal_read_repair_chance = 0.1;
 
 create table if not exists user_follower
 (
 	user_email text,
-	follower_email text,
 	created_at timestamp,
-	primary key (user_email, follower_email)
+	follower_email text,
+	follower_id bigint,
+	primary key (user_email, created_at)
 )
 with caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
-	and compaction = {'max_threshold': '32', 'min_threshold': '4', 'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy'}
-	and compression = {'class': 'org.apache.cassandra.io.compress.LZ4Compressor', 'chunk_length_in_kb': '64'}
+	and compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+	and compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
 	and dclocal_read_repair_chance = 0.1;
 
 create table if not exists user_follows
@@ -134,8 +150,8 @@ create table if not exists user_follows
 	primary key (follows_email, user_email)
 )
 with caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
-	and compaction = {'max_threshold': '32', 'min_threshold': '4', 'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy'}
-	and compression = {'class': 'org.apache.cassandra.io.compress.LZ4Compressor', 'chunk_length_in_kb': '64'}
+	and compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+	and compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
 	and dclocal_read_repair_chance = 0.1;
 
 create table if not exists user_post
@@ -150,6 +166,7 @@ create table if not exists user_post
 	primary key ((user_email, content_type), created_at)
 )
 with caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
-	and compaction = {'max_threshold': '32', 'min_threshold': '4', 'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy'}
-	and compression = {'class': 'org.apache.cassandra.io.compress.LZ4Compressor', 'chunk_length_in_kb': '64'}
+	and compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+	and compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
 	and dclocal_read_repair_chance = 0.1;
+
