@@ -8,4 +8,6 @@ public interface ProfileDictionaryRepository extends CassandraRepository<Profile
 
     ProfileDictionaryCql findByPath(String path);
 
+    void deleteByPath(String path);
+
 }
