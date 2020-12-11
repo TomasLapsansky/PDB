@@ -1,5 +1,6 @@
 package com.vut.fit.pdb2020.database.cassandra.domain;
 
+import com.vut.fit.pdb2020.database.mariaDB.domain.UserSql;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
@@ -30,6 +31,16 @@ public class UserCql {
     private Instant created_at;
 
     public UserCql() {}
+
+    public UserCql(UserSql userSql) {
+        this.email = userSql.getEmail();
+        this.name = userSql.getName();
+        this.surname = userSql.getSurname();
+        this.password_hash = userSql.getPassword_hash();
+        this.profile_path = userSql.getProfilePath();
+        this.profile_photo_path = userSql.getProfilePhotoPath();
+        this.created_at = userSql.getCreated_at();
+    }
 
     public UserCql(String email, String name, String surname, String password_hash, String profile_path, String profile_photo_path, Instant last_active, List<Long> owned_pages, Boolean status, Instant created_at) {
         this.email = email;

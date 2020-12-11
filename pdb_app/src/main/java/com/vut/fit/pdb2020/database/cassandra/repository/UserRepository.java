@@ -9,4 +9,6 @@ public interface UserRepository extends CassandraRepository<UserCql, String> {
 
     UserCql findByEmail(String email);
 
+    void deleteByEmail(String email);
+
 }
