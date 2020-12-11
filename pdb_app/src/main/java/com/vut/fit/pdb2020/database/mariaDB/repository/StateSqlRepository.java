@@ -13,4 +13,6 @@ public interface StateSqlRepository extends JpaRepository<StateSql, String> {
 
     List<StateSql> findAll();
 
+    void deleteById(Long id);
+
 }

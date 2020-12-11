@@ -97,7 +97,7 @@ public class UserQueryController {
 
         assert profileSlug != null;
 
-        String profilePath = String.format("/user/%s", profileSlug);
+        String profilePath = String.format("/user/%s", profileSlug).toLowerCase();
         ProfileDictionaryCql profileDictionaryCql = profileDictionaryRepository.findByPath(profilePath);
 
         assert profileDictionaryCql != null;

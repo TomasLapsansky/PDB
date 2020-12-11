@@ -30,10 +30,4 @@ public class App extends SpringBootServletInitializer {
 		return new BCryptPasswordEncoder();
 	}
 
-	@Bean
-	@Scope("singleton")
-	public LikeAggregator likeAggregator() {
-		return new LikeAggregator();
-	}
-
 }

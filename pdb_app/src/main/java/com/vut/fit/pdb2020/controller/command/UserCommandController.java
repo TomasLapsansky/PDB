@@ -113,6 +113,7 @@ public class UserCommandController {
 
         userSql.setDeleted(true);
         userSql.setUpdated_at(Instant.now());
+        userSqlRepository.save(userSql);
 
         userRepository.deleteByEmail(email);
 
