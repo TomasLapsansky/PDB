@@ -1,6 +1,7 @@
 package com.vut.fit.pdb2020.database.cassandra.domain;
 
 import com.datastax.oss.driver.api.core.data.UdtValue;
+import com.vut.fit.pdb2020.database.cassandra.dataTypes.Comment;
 import com.vut.fit.pdb2020.database.cassandra.dataTypes.Like;
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
@@ -30,7 +31,7 @@ public class UserPostCql {
     @Column("user_profile_path")
     private String userProfilePath;
 
-    private List<UdtValue> comments;
+    private List<Comment> comments;
 
     private List<Like> likes;
 
@@ -69,13 +70,17 @@ public class UserPostCql {
         this.userProfilePath = user_profile_path;
     }
 
-    public List<UdtValue> getComments() {
+    public List<Comment> getComments() {
         return comments;
     }
 
-    public void setComments(List<UdtValue> comments) {
+    public void setComments(List<Comment> comments) {
         this.comments = comments;
     }
+
+    public TreeSet<Comment> getTreeComments() { return new TreeSet<>(comments); }
+
+    public void setTreeComments(TreeSet<Comment> comments) {this.comments = new ArrayList<>(comments); }
 
     public List<Like> getLikes() {
         return likes;

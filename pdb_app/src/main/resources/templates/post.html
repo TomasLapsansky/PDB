@@ -78,5 +78,63 @@
     <button id="like">Like</button>
 </form>
 
+<hr>
+
+<h3>Comment post</h3>
+<form target="_blank" class="col-md-6 col" action="/post/comment" method="post" enctype="multipart/form-data">
+    <label>Who comments</label>
+    <input type="text" name="commentGiverMail" >
+    <label>Comment</label>
+    <input type="text" name="content" >
+    <label for="emailuserPost">Page ID</label>
+    <input type="text" name="pageId" >
+    <label for="emailuserPost">User mail</label>
+    <input type="text" name="userMail">
+    <label for="pageName">Content type</label>
+    <input type="textarea" name="contentType">
+    <label>Created at</label>
+    <input type="text" name="createdAt">
+    <button id="comment">Comment</button>
+</form>
+
+<hr>
+
+<h3>Comment delete</h3>
+<form target="_blank" class="col-md-6 col" action="/post/comment" method="post" enctype="multipart/form-data">
+    <label>Who commented</label>
+    <input type="text" name="commentGiverMail" >
+    <input style="display: none" type="text" name="content" >
+    <label for="emailuserPost">Page ID</label>
+    <input type="text" name="pageId" >
+    <label for="emailuserPost">User mail</label>
+    <input type="text" name="userMail">
+    <label for="pageName">Content type</label>
+    <input type="textarea" name="contentType">
+    <label>Created at</label>
+    <input type="text" name="createdAt">
+    <button id="commentDelete">Comment delete</button>
+</form>
+
+<hr>
+
+<h3>Comment like</h3>
+<form target="_blank" class="col-md-6 col" action="/comment/like" method="post" enctype="multipart/form-data">
+    <label>Who likes</label>
+    <input type="text" name="likeGiverMail" >
+    <label for="emailuserPost">Comment ID</label>
+    <input type="text" name="commentId" >
+    <label for="emailuserPost">Comment owner mail</label>
+    <input type="text" name="commentUserEmail">
+    <label for="emailuserPost">Page ID</label>
+    <input type="text" name="postPageId" >
+    <label for="emailuserPost">User mail</label>
+    <input type="text" name="postUserMail">
+    <label for="pageName">Content type</label>
+    <input type="textarea" name="contentType">
+    <label>Created at</label>
+    <input type="text" name="createdAt">
+    <button id="commentLike">Comment delete</button>
+</form>
+
 </body>
 </html>
