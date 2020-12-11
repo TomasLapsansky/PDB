@@ -16,7 +16,7 @@ public class UserCreateDto {
 
     private String city;
 
-    private Integer stateId;
+    private Long stateId;
 
     public String getGender() {
         return gender;
@@ -42,11 +42,11 @@ public class UserCreateDto {
         this.city = city;
     }
 
-    public Integer getStateId() {
+    public Long getStateId() {
         return stateId;
     }
 
-    public void setStateId(Integer state) {
+    public void setStateId(Long state) {
         this.stateId = state;
     }
 
