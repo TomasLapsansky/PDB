@@ -3,10 +3,6 @@ package com.vut.fit.pdb2020;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vut.fit.pdb2020.database.dto.UserCreateDto;
 import com.vut.fit.pdb2020.database.dto.UserDetailDto;
-import com.vut.fit.pdb2020.database.mariaDB.repository.ProfileDictionarySqlRepository;
-import com.vut.fit.pdb2020.database.mariaDB.repository.StateSqlRepository;
-import com.vut.fit.pdb2020.database.mariaDB.repository.UserSqlRepository;
-import net.minidev.json.JSONObject;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.message.BasicNameValuePair;
@@ -16,14 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.hibernate.query.criteria.internal.ValueHandlerFactory.isNumeric;
 
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Arrays;
 import java.util.Collections;

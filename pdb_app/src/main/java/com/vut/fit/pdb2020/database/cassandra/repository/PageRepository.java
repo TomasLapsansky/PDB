@@ -7,4 +7,6 @@ public interface PageRepository extends CassandraRepository<PageCql, String> {
 
     PageCql findById(Long id);
 
+    void deleteById(Long id);
+
 }
