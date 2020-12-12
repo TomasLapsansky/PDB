@@ -68,6 +68,9 @@ class PostServiceEventHandlerImpl implements PostServiceEventHandler {
 
             assert page != null;
 
+            page.setLast_active(Instant.now());
+            pageRepository.save(page);
+
             PagePostCql post = new PagePostCql();
             post.setPage_id(postDto.getPageId());
             post.setPage_name(page.getName());
