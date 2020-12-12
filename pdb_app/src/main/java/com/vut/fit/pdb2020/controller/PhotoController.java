@@ -9,6 +9,7 @@ import com.vut.fit.pdb2020.database.mariaDB.repository.UserSqlRepository;
 import com.vut.fit.pdb2020.utils.FileUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +19,7 @@ import javax.servlet.ServletContext;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 
 @RestController
 public class PhotoController {
@@ -41,12 +43,12 @@ public class PhotoController {
     FileUtility fileUtility;
 
     @Transactional
-    @PostMapping("/user/photo/upload")
-    public String uploadUserPhoto(@RequestParam String authorEmail, @RequestParam MultipartFile file) throws IOException {
+    @PostMapping("/photo/upload/user")
+    public String uploadUserPhoto(@RequestParam String ownerEmail, @RequestParam MultipartFile file) throws IOException {
 
-        assert authorEmail != null && !file.isEmpty();
+        assert ownerEmail != null && !file.isEmpty();
 
-        UserSql userSql = userSqlRepository.findByEmail(authorEmail);
+        UserSql userSql = userSqlRepository.findByEmail(ownerEmail);
         assert userSql != null;
 
         File dest = fileUtility.saveFile(file, null, userSql.getEmail());
@@ -64,12 +66,12 @@ public class PhotoController {
     }
 
     @Transactional
-    @PostMapping("/page/photo/upload")
-    public String uploadPagePhoto(@RequestParam Long pageId, @RequestParam MultipartFile file) throws IOException {
+    @PostMapping("/photo/upload/page")
+    public String uploadPagePhoto(@RequestParam Long ownerId, @RequestParam MultipartFile file) throws IOException {
 
-        assert pageId != null && !file.isEmpty();
+        assert ownerId != null && !file.isEmpty();
 
-        PageSql pageSql = pageSqlRepository.findById(pageId);
+        PageSql pageSql = pageSqlRepository.findById(ownerId);
         assert pageSql != null;
 
         File dest = fileUtility.saveFile(file, pageSql.getId(), null);
@@ -87,13 +89,16 @@ public class PhotoController {
     }
 
     @Transactional
-    @PostMapping("/photo/delete")
-    public String deletePhoto() {
+    @DeleteMapping("/photo/delete")
+    public void deletePhoto(@RequestParam String path) {
+        File toDelete = new File(path);
+        if  (toDelete.delete()) {
+            PhotoSql photo = photoSqlRepository.findByPath(path);
+            photo.setDeleted(true);
+            photo.setUpdated_at(Instant.now());
 
-        //TODO -> when do we delete photo ?
-
-        return "";
-
+            photoSqlRepository.save(photo);
+        }
     }
 
 }
