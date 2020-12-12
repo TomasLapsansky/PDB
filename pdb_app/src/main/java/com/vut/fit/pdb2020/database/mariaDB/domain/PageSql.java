@@ -113,7 +113,7 @@ public class PageSql implements Serializable {
 
     public String getProfilePath() {
         if (profilePath == null) {
-            profilePath = String.format("/page/%s.%d", name.toLowerCase(), id);
+            profilePath = String.format("/page/%s.%d", name.toLowerCase().replaceAll("\\s+",""), id);
         }
         return profilePath;
     }

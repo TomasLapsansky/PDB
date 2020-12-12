@@ -25,6 +25,8 @@ import java.util.stream.Collectors;
 @RestController
 public class WallController {
 
+    //TODO -> do we need this ?
+
     @Autowired
     UserRepository userRepository;
 

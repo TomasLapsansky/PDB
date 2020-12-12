@@ -1,4 +1,4 @@
-package com.vut.fit.pdb2020.controller;
+package com.vut.fit.pdb2020.controller.command;
 
 import com.vut.fit.pdb2020.database.cassandra.dataTypes.Like;
 import com.vut.fit.pdb2020.database.cassandra.domain.PageCql;
@@ -30,7 +30,7 @@ import java.time.Instant;
 import java.util.List;
 
 @RestController
-public class PostController {
+public class PostCommandController {
 
     @Autowired
     UserSqlRepository userSqlRepository;
@@ -89,7 +89,7 @@ public class PostController {
 
     @Transactional
     @PostMapping("/user/post/delete")
-    public String deleteUserPost(@RequestParam String email, @RequestParam String contentType, @RequestParam String createdAt) {
+    public void deleteUserPost(@RequestParam String email, @RequestParam String contentType, @RequestParam String createdAt) {
 
         assert email != null && contentType != null && createdAt != null;
 
@@ -100,8 +100,6 @@ public class PostController {
         postDto.setCreatedAt(createdAt);
 
         postService.deletePost(postDto);
-
-        return "Post deleted";
 
     }
 
