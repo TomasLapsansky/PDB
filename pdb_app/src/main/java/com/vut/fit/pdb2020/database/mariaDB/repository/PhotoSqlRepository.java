@@ -7,4 +7,8 @@ public interface PhotoSqlRepository extends JpaRepository<PhotoSql, String> {
 
     PhotoSql findById(Integer id);
 
+    PhotoSql findByPath(String path);
+
+    PhotoSql deleteByPath(String path);
+
 }

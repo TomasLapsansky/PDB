@@ -19,6 +19,7 @@ import com.vut.fit.pdb2020.database.mariaDB.service.PostService;
 import com.vut.fit.pdb2020.utils.LikeAggregator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.parameters.P;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -88,7 +89,7 @@ public class PostCommandController {
     }
 
     @Transactional
-    @PostMapping("/user/post/delete")
+    @DeleteMapping("/user/post/delete")
     public void deleteUserPost(@RequestParam String email, @RequestParam String contentType, @RequestParam String createdAt) {
 
         assert email != null && contentType != null && createdAt != null;
