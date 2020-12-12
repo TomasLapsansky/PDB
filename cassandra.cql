@@ -84,7 +84,8 @@ create table if not exists page_post
 with caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
 	and compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
 	and compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
-	and dclocal_read_repair_chance = 0.1;
+	and dclocal_read_repair_chance = 0.1
+    and default_time_to_live = 604800;
 
 create table if not exists profile_link_dictionary
 (
@@ -95,8 +96,7 @@ create table if not exists profile_link_dictionary
 with caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
 	and compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
 	and compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
-	and dclocal_read_repair_chance = 0.1
-	and default_time_to_live = 1209600;
+	and dclocal_read_repair_chance = 0.1;
 
 create table if not exists user
 (
@@ -168,5 +168,6 @@ create table if not exists user_post
 with caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
 	and compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
 	and compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
-	and dclocal_read_repair_chance = 0.1;
+	and dclocal_read_repair_chance = 0.1
+    and default_time_to_live = 604800;
 

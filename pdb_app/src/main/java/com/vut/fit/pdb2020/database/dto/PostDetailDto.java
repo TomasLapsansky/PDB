@@ -13,6 +13,8 @@ public class PostDetailDto {
 
     private List<PostDetailLikeDto> likes;
 
+    private List<PostDetailCommentDto> comments;
+
     private Instant createdAt;
 
     public String getContentType() {
@@ -50,5 +52,13 @@ public class PostDetailDto {
 
     public int getLikeCount() {
         return likeCount;
+    }
+
+    public List<PostDetailCommentDto> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<PostDetailCommentDto> comments) {
+        this.comments = comments;
     }
 }

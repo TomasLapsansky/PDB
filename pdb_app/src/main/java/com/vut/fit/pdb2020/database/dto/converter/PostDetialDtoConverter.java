@@ -1,11 +1,10 @@
 package com.vut.fit.pdb2020.database.dto.converter;
 
+import com.vut.fit.pdb2020.database.cassandra.dataTypes.Comment;
 import com.vut.fit.pdb2020.database.cassandra.dataTypes.Like;
 import com.vut.fit.pdb2020.database.cassandra.domain.PagePostCql;
 import com.vut.fit.pdb2020.database.cassandra.domain.UserPostCql;
-import com.vut.fit.pdb2020.database.dto.PostDetailDto;
-import com.vut.fit.pdb2020.database.dto.PostDetailLikeDto;
-import com.vut.fit.pdb2020.database.dto.PostLikeDto;
+import com.vut.fit.pdb2020.database.dto.*;
 import com.vut.fit.pdb2020.database.mariaDB.domain.PostSql;
 import org.springframework.stereotype.Component;
 
@@ -30,6 +29,14 @@ public class PostDetialDtoConverter {
                     postLikes.add(new PostDetailLikeDto(like));
                 }
                 postDetailDto.setLikes(postLikes);
+            }
+
+            List<PostDetailCommentDto> comments = new ArrayList<>();
+            if (post.getComments() != null) {
+                for (Comment comment :  post.getComments()) {
+                    comments.add(new PostDetailCommentDto(comment));
+                }
+                postDetailDto.setComments(comments);
             }
         }
 
