@@ -24,10 +24,9 @@ public class UserServiceDto {
 
     private boolean delete;
 
-    public UserServiceDto() {
-        password = false;
-        delete = false;
-    }
+    private boolean isPhoto;
+
+    public UserServiceDto() {    }
 
     public UserServiceDto(UserSql user) {
         id = user.getId();
@@ -103,7 +102,7 @@ public class UserServiceDto {
     }
 
     public void setPassword(boolean password) {
-        this.password = delete;
+        this.password = password;
     }
 
     public boolean isDelete() {
@@ -120,5 +119,13 @@ public class UserServiceDto {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public boolean isPhoto() {
+        return isPhoto;
+    }
+
+    public void setPhoto(boolean photo) {
+        isPhoto = photo;
     }
 }

@@ -19,6 +19,10 @@ public interface UserServiceEventHandler {
 
     void deleteUser(UserServiceDto userServiceDto);
 
+    void addProfilePic(UserServiceDto userServiceDto);
+
+    void deleteProfilePic(UserServiceDto userServiceDto);
+
 }
 
 @Service
@@ -38,7 +42,15 @@ class UserServiceEventHandlerImpl implements UserServiceEventHandler {
         try{
             UserServiceDto user = OBJECT_MAPPER.readValue(userStr, UserServiceDto.class);
             if (user.isDelete()) {
+                if (user.isPhoto()) {
+                    this.deleteProfilePic(user);
+                    return;
+                }
                 this.deleteUser(user);
+                return;
+            }
+            if (user.isPhoto()) {
+                this.addProfilePic(user);
                 return;
             }
             if (user.isPassword()) {
@@ -83,6 +95,29 @@ class UserServiceEventHandlerImpl implements UserServiceEventHandler {
 
     public void deleteUser(UserServiceDto userServiceDto) {
         userRepository.deleteByEmail(userServiceDto.getEmail());
+    }
+
+    public void addProfilePic(UserServiceDto userServiceDto) {
+
+        UserCql userCql = userRepository.findByEmail(userServiceDto.getEmail());
+
+        assert userCql != null;
+
+        userCql.setProfile_photo_path(userServiceDto.getProfilePhotoPath());
+        userCql.setLast_active(Instant.now());
+        userRepository.save(userCql);
+
+    }
+
+    public void deleteProfilePic(UserServiceDto userServiceDto) {
+
+        UserCql userCql = userRepository.findByEmail(userServiceDto.getEmail());
+
+        assert userCql != null;
+
+        userCql.setProfile_photo_path(null);
+        userRepository.save(userCql);
+
     }
 
 }

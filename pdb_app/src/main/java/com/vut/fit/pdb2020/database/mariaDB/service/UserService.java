@@ -19,6 +19,10 @@ public interface UserService {
 
     void deleteUser(UserServiceDto userServiceDto);
 
+    void addProfilePic(UserServiceDto userServiceDto);
+
+    void deleteProfilePic(UserServiceDto userServiceDto);
+
 }
 
 @Service
@@ -58,6 +62,18 @@ class UserServiceImpl implements UserService {
 
     public void deleteUser(UserServiceDto userServiceDto) {
         userServiceDto.setDelete(true);
+        this.raiseEvent(userServiceDto);
+    }
+
+    public void addProfilePic(UserServiceDto userServiceDto) {
+        userServiceDto.setDelete(false);
+        userServiceDto.setPhoto(true);
+        this.raiseEvent(userServiceDto);
+    }
+
+    public void deleteProfilePic(UserServiceDto userServiceDto) {
+        userServiceDto.setDelete(true);
+        userServiceDto.setPhoto(true);
         this.raiseEvent(userServiceDto);
     }
 

@@ -22,6 +22,7 @@ import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.List;
 
 @RestController
 public class UserCommandController {
@@ -165,9 +166,15 @@ public class UserCommandController {
     }
 
     @PostMapping("/user/delete")
-    public String deleteUser(@RequestParam String email) {
+    public String deleteUser(@RequestParam String email) throws Exception {
 
         UserSql userSql = userSqlRepository.findByEmail(email);
+
+        List<UserPageSql> pages = userPageSqlRepository.findUserPageSqlByUser(userSql);
+
+        if (pages.size() != 0) {
+            throw new Exception("Cannot delete user, has active pages !");
+        }
 
         if (userSql == null)
             throw new BadCredentialsException("User does not exist!");
@@ -183,7 +190,7 @@ public class UserCommandController {
     }
 
     @PostMapping("/user/addProfilePic")
-    public String addProfilePic(@RequestParam String email, @RequestParam MultipartFile file ) throws IOException {
+    public Long addProfilePic(@RequestParam String email, @RequestParam MultipartFile file ) throws IOException {
 
         assert email != null;
 
@@ -204,28 +211,16 @@ public class UserCommandController {
         userSql.setUpdated_at(Instant.now());
         userSqlRepository.save(userSql);
 
-        UserCql userCql = userRepository.findByEmail(email);
+        UserServiceDto userServiceDto = new UserServiceDto(userSql);
+        userService.addProfilePic(userServiceDto);
 
-        if (userCql != null) {
-            userCql.setProfile_photo_path(filePath);
-            userCql.setLast_active(Instant.now());
-            userRepository.save(userCql);
-        }
-
-        return "Photo added";
+        return photoSql.getId();
     }
 
     @PostMapping("/user/removeProfilePic")
-    public String removeProfilePic(@RequestParam String email) {
+    public void removeProfilePic(@RequestParam String email) {
 
         assert email != null;
-
-        UserCql userCql = userRepository.findByEmail(email);
-
-        if (userCql != null) {
-            userCql.setProfile_photo_path(null);
-            userRepository.save(userCql);
-        }
 
         UserSql userSql = userSqlRepository.findByEmail(email);
         assert userSql != null;
@@ -239,7 +234,8 @@ public class UserCommandController {
         photoSql.setUpdated_at(Instant.now());
         photoSqlRepository.save(photoSql);
 
-        return "Profile pic deleted";
+        UserServiceDto userServiceDto = new UserServiceDto(userSql);
+        userService.deleteProfilePic(userServiceDto);
 
     }
 
