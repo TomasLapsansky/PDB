@@ -10,4 +10,6 @@ import java.util.List;
 public interface UserChatRepository extends CassandraRepository<UserChatCql, String> {
 
     List<UserChatCql> findAllByUserEmail(String email);
+
+    UserChatCql findByUserEmailAndChatId(String email, Long chatId);
 }
