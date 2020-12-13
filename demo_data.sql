@@ -35,13 +35,11 @@ INSERT INTO pdbSql.post (id, content_type, content, user_id, page_id, wall_id, c
 INSERT INTO pdbSql.post (id, content_type, content, user_id, page_id, wall_id, created_at, updated_at, deleted) VALUES (31, 'text', 'I like Java.', null, 27, 108, '2020-12-12 20:00:00.938', '2020-12-12 20:00:00.938', 0);
 INSERT INTO pdbSql.post (id, content_type, content, user_id, page_id, wall_id, created_at, updated_at, deleted) VALUES (32, 'text', 'What does Apache Kafka have in common with Alfonz Kafka?', null, 27, 108, '2020-12-12 20:00:30.306', '2020-12-12 20:00:30.306', 0);
 
-INSERT INTO pdbSql.post_like (id, user_id, post_id, created_at, updated_at, deleted) VALUES (23, 2, 17, '2020-12-10 15:00:09', '2020-12-10 16:01:14', 1);
-INSERT INTO pdbSql.post_like (id, user_id, post_id, created_at, updated_at, deleted) VALUES (25, 2, 17, '2020-12-10 15:20:40', '2020-12-10 15:20:40', 0);
-INSERT INTO pdbSql.post_like (id, user_id, post_id, created_at, updated_at, deleted) VALUES (26, 2, 27, '2020-12-10 16:04:28', '2020-12-10 17:04:59', 1);
+INSERT INTO pdbSql.post_like (id, user_id, post_id, created_at, updated_at, deleted) VALUES (25, 2, 31, '2020-12-10 15:20:40', '2020-12-10 15:20:40', 0);
 INSERT INTO pdbSql.post_like (id, user_id, post_id, created_at, updated_at, deleted) VALUES (27, 1, 32, '2020-12-12 19:01:26', '2020-12-12 19:01:26', 0);
 INSERT INTO pdbSql.post_like (id, user_id, post_id, created_at, updated_at, deleted) VALUES (28, 2, 32, '2020-12-12 19:01:32', '2020-12-12 19:01:32', 0);
 
-INSERT INTO pdbSql.comment (id, content, user_id, page_id, post_id, created_at, updated_at, deleted) VALUES (2, 'Second comment ever !', 2, null, 17, '2020-12-10 19:02:44', '2020-12-10 19:02:44', 0);
+INSERT INTO pdbSql.comment (id, content, user_id, page_id, post_id, created_at, updated_at, deleted) VALUES (2, 'Second comment ever !', 2, null, 4, '2020-12-10 19:02:44', '2020-12-10 19:02:44', 0);
 INSERT INTO pdbSql.comment (id, content, user_id, page_id, post_id, created_at, updated_at, deleted) VALUES (3, 'Fajne!', 2, null, 32, '2020-12-12 19:21:16', '2020-12-12 19:21:16', 0);
 
 INSERT INTO pdbSql.comment_like (id, user_id, comment_id, created_at, updated_at, deleted) VALUES (3, 1, 2, '2020-12-11 08:54:32', '2020-12-11 08:54:32', 0);
