@@ -6,6 +6,7 @@ import com.vut.fit.pdb2020.database.cassandra.repository.UserPostRepository;
 import com.vut.fit.pdb2020.database.dto.PostDetailDto;
 import com.vut.fit.pdb2020.database.dto.UserCreateDto;
 import com.vut.fit.pdb2020.database.dto.UserDetailDto;
+import com.vut.fit.pdb2020.database.dto.UserDto;
 import com.vut.fit.pdb2020.database.mariaDB.domain.PostSql;
 import com.vut.fit.pdb2020.database.mariaDB.domain.StateSql;
 import com.vut.fit.pdb2020.database.mariaDB.domain.UserPageSql;
@@ -136,4 +137,39 @@ public class UserDtoConverter {
         return userDetailDto;
     }
 
+    public UserDto userCqlToBasic(UserCql userCql) {
+
+        UserDto userDto = null;
+
+        if (userCql != null) {
+
+            userDto = new UserDto(
+                    userCql.getName(),
+                    userCql.getSurname(),
+                    userCql.getProfile_path(),
+                    userCql.getProfile_photo_path(),
+                    userCql.getStatus()
+            );
+        }
+
+        return userDto;
+    }
+
+    public UserDto userSqlToBasic(UserSql userSql) {
+
+        UserDto userDto = null;
+
+        if (userSql != null) {
+
+            userDto = new UserDto(
+                userSql.getName(),
+                userSql.getSurname(),
+                userSql.getProfilePath(),
+                userSql.getProfilePhotoPath(),
+                false
+            );
+        }
+
+        return userDto;
+    }
 }

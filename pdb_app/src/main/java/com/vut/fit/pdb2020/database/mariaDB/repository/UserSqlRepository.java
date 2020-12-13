@@ -8,4 +8,5 @@ public interface UserSqlRepository extends JpaRepository<UserSql, Long> {
 
     UserSql findByEmail(String email);
 
+    UserSql findByProfilePath(String path);
 }

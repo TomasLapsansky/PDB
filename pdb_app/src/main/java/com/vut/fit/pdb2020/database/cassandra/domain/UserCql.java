@@ -1,5 +1,6 @@
 package com.vut.fit.pdb2020.database.cassandra.domain;
 
+import org.springframework.data.cassandra.core.mapping.Column;
 import com.vut.fit.pdb2020.database.mariaDB.domain.UserSql;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
@@ -18,7 +19,8 @@ public class UserCql {
 
     private String password_hash;
 
-    private String profile_path;
+    @Column("profile_path")
+    private String profilePath;
 
     private String profile_photo_path;
 
@@ -37,7 +39,7 @@ public class UserCql {
         this.name = userSql.getName();
         this.surname = userSql.getSurname();
         this.password_hash = userSql.getPassword_hash();
-        this.profile_path = userSql.getProfilePath();
+        this.profilePath = userSql.getProfilePath();
         this.profile_photo_path = userSql.getProfilePhotoPath();
         this.created_at = userSql.getCreated_at();
     }
@@ -47,7 +49,7 @@ public class UserCql {
         this.name = name;
         this.surname = surname;
         this.password_hash = password_hash;
-        this.profile_path = profile_path;
+        this.profilePath = profile_path;
         this.profile_photo_path = profile_photo_path;
         this.last_active = last_active;
         this.owned_pages = owned_pages;
@@ -88,11 +90,11 @@ public class UserCql {
     }
 
     public String getProfile_path() {
-        return profile_path;
+        return profilePath;
     }
 
     public void setProfile_path(String profile_path) {
-        this.profile_path = profile_path;
+        this.profilePath = profile_path;
     }
 
     public String getProfile_photo_path() {

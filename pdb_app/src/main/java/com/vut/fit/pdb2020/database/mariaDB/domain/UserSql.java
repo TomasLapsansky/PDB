@@ -6,6 +6,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table(name="user")
@@ -51,6 +52,9 @@ public class UserSql implements Serializable {
     @JoinColumn(name = "wall_id")
     private WallSql wall;
 
+    @ManyToMany
+    private List<ChatSql> chats;
+
     @Column
     private Instant created_at;
 
@@ -60,7 +64,7 @@ public class UserSql implements Serializable {
     @Column
     private Boolean deleted;
 
-    @Transient
+    @Column(name = "profile_path")
     private String profilePath;
 
     public UserSql() {

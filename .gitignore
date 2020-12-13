@@ -30,3 +30,6 @@ hs_err_pid*
 **/assets/
 package-lock.json
 package.json
+
+# kafka
+zk-single-kafka-multiple/
