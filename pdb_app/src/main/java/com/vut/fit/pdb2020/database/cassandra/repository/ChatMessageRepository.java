@@ -8,4 +8,6 @@ import java.util.List;
 public interface ChatMessageRepository extends CassandraRepository<ChatMessageCql, String> {
 
     List<ChatMessageCql> findAllByChatId(Long chatId);
+
+    void deleteAllByChatId(Long id);
 }

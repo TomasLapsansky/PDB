@@ -9,4 +9,6 @@ import java.util.UUID;
 public interface ChatRepository extends CassandraRepository<ChatCql, String> {
 
     ChatCql findById(Long id);
+
+    void deleteById(Long id);
 }

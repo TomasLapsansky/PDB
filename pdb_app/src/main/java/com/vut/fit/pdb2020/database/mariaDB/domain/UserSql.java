@@ -64,7 +64,7 @@ public class UserSql implements Serializable {
     @Column
     private Boolean deleted;
 
-    @Column(name = "profile_path")
+    @Transient
     private String profilePath;
 
     public UserSql() {

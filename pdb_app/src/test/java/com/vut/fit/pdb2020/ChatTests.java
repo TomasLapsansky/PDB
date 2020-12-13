@@ -1,19 +1,12 @@
 package com.vut.fit.pdb2020;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vut.fit.pdb2020.database.cassandra.domain.ProfileDictionaryCql;
-import com.vut.fit.pdb2020.database.cassandra.domain.UserCql;
-import com.vut.fit.pdb2020.database.cassandra.repository.ProfileDictionaryRepository;
-import com.vut.fit.pdb2020.database.cassandra.repository.UserRepository;
+import com.vut.fit.pdb2020.database.cassandra.domain.*;
+import com.vut.fit.pdb2020.database.cassandra.repository.*;
 import com.vut.fit.pdb2020.database.dto.GroupCreateDto;
 import com.vut.fit.pdb2020.database.dto.MessageSendDto;
-import com.vut.fit.pdb2020.database.mariaDB.domain.ProfileDictionarySql;
-import com.vut.fit.pdb2020.database.mariaDB.domain.UserSql;
-import com.vut.fit.pdb2020.database.mariaDB.domain.WallSql;
-import com.vut.fit.pdb2020.database.mariaDB.repository.ChatSqlRepository;
-import com.vut.fit.pdb2020.database.mariaDB.repository.ProfileDictionarySqlRepository;
-import com.vut.fit.pdb2020.database.mariaDB.repository.UserSqlRepository;
-import com.vut.fit.pdb2020.database.mariaDB.repository.WallSqlRepository;
+import com.vut.fit.pdb2020.database.mariaDB.domain.*;
+import com.vut.fit.pdb2020.database.mariaDB.repository.*;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +40,25 @@ public class ChatTests {
     UserRepository userRepository;
 
     @Autowired
+    UserChatRepository userChatRepository;
+
+    @Autowired
+    UserChatSqlRepository userChatSqlRepository;
+
+    @Autowired
     ChatSqlRepository chatSqlRepository;
+
+    @Autowired
+    MessageSqlRepository messageSqlRepository;
+
+    @Autowired
+    ChatRepository chatRepository;
+
+    @Autowired
+    ChatMessageRepository chatMessageRepository;
+
+    @Autowired
+    ChatUserRepository chatUserRepository;
 
     @Autowired
     UserSqlRepository userSqlRepository;
@@ -81,7 +92,7 @@ public class ChatTests {
         wall2 = wallSqlRepository.save(wall2);
 
         userSql1 = new UserSql();
-        userSql1.setEmail("user1@nonexist");
+        userSql1.setEmail("user1@nonemail");
         userSql1.setName("blank");
         userSql1.setSurname("user");
         userSql1.setPassword_hash("pass");
@@ -90,7 +101,7 @@ public class ChatTests {
         userSql1 = userSqlRepository.save(userSql1);
 
         userSql2 = new UserSql();
-        userSql2.setEmail("user2@nonexist");
+        userSql2.setEmail("user2@nonemail");
         userSql2.setName("empty");
         userSql2.setSurname("useress");
         userSql2.setPassword_hash("pass");
@@ -99,12 +110,12 @@ public class ChatTests {
         userSql2 = userSqlRepository.save(userSql2);
 
         userCql1 = new UserCql();
-        userCql1.setEmail("user1@nonexist");
+        userCql1.setEmail("user1@nonemail");
         userCql1.setProfile_path(userSql1.getProfilePath());
         userCql1 = userRepository.save(userCql1);
 
         userCql2 = new UserCql();
-        userCql2.setEmail("user2@nonexist");
+        userCql2.setEmail("user2@nonemail");
         userCql2.setProfile_path(userSql2.getProfilePath());
         userCql2 = userRepository.save(userCql2);
 
@@ -135,8 +146,8 @@ public class ChatTests {
 
         MessageSendDto messageDto = new MessageSendDto();
         messageDto.setContent("no message");
-        messageDto.setAuthor("user1@nonexist");
-        messageDto.setReceiver("user2@nonexist");
+        messageDto.setAuthor("user1@nonemail");
+        messageDto.setReceiver("user2@nonemail");
 
         String messageJson = jsonObjectMapper.writeValueAsString(messageDto);
 
@@ -146,7 +157,7 @@ public class ChatTests {
                 .accept(MediaType.ALL))
                 .andExpect(status().isOk()).andReturn();
 
-        assertThat(NumberUtils.isCreatable(result.getResponse().getContentAsString())).isTrue();
+        assertThat(result.getResponse().getContentAsString().equals("Message send")).isTrue();
 
         Thread.sleep(2000);
 
@@ -177,14 +188,14 @@ public class ChatTests {
     @Order(3)
     public void getChats() throws Exception {
 
-        String profileSlug = String.format("%s.%d", userSql1.getName(), userSql1.getId()).toLowerCase();
+        String profileSlug = String.format("%s%s.%d", userSql1.getName(), userSql1.getSurname(), userSql1.getId()).toLowerCase();
 
         MvcResult result = mvc.perform(get("/chats/{slug}", profileSlug)
         ).andExpect(status().isOk()).andReturn();
 
         String resultString = result.getResponse().getContentAsString();
 
-        assertThat(resultString.contains("nonexist group")).isTrue();
+        assertThat(resultString.contains("test group")).isFalse();
 
     }
 
@@ -196,8 +207,79 @@ public class ChatTests {
         profileDictionaryRepository.deleteByPath(userSql1.getProfilePath());
         profileDictionaryRepository.deleteByPath(userSql2.getProfilePath());
 
+        userSql1 = userSqlRepository.findByEmail(userSql1.getEmail());
+
+        List<UserChatSql> userChatSql1List = userChatSqlRepository.findAllByUser(userSql1);
+
+        for (UserChatSql userChatSql:
+             userChatSql1List) {
+
+            ChatSql chatSql = userChatSql.getChat();
+            List<MessageSql> messageSqlList = chatSql.getMessages();
+
+//            for (MessageSql messageSql:
+//                    messageSqlList) {
+//
+//                messageSqlRepository.delete(messageSql);
+//            }
+
+            userChatSqlRepository.delete(userChatSql);
+
+            // delete CQL
+            chatRepository.deleteById(chatSql.getId());
+            chatMessageRepository.deleteAllByChatId(chatSql.getId());
+
+            List<ChatUserCql> chatUserCqlList = chatUserRepository.findAllByChatId(chatSql.getId());
+
+            for (ChatUserCql chatUserCql:
+                    chatUserCqlList) {
+
+                UserChatCql userChatCql = userChatRepository.findByUserEmailAndChatId(chatUserCql.getUserEmail(), chatUserCql.getChatId());
+                userChatRepository.delete(userChatCql);
+                chatUserRepository.delete(chatUserCql);
+            }
+
+
+            //chatSqlRepository.delete(chatSql);
+        }
+
         userSql1.setDeleted(true);
         userSqlRepository.save(userSql1);
+        userSql2 = userSqlRepository.findByEmail(userSql2.getEmail());
+
+        List<UserChatSql> userChatSql2List = userChatSqlRepository.findAllByUser(userSql1);
+
+        for (UserChatSql userChatSql:
+                userChatSql2List) {
+
+            ChatSql chatSql = userChatSql.getChat();
+            List<MessageSql> messageSqlList = chatSql.getMessages();
+
+//            for (MessageSql messageSql:
+//                 messageSqlList) {
+//
+//                messageSqlRepository.delete(messageSql);
+//            }
+
+            userChatSqlRepository.delete(userChatSql);
+
+            // delete CQL
+            chatRepository.deleteById(chatSql.getId());
+            chatMessageRepository.deleteAllByChatId(chatSql.getId());
+
+            List<ChatUserCql> chatUserCqlList = chatUserRepository.findAllByChatId(chatSql.getId());
+
+            for (ChatUserCql chatUserCql:
+                 chatUserCqlList) {
+
+                UserChatCql userChatCql = userChatRepository.findByUserEmailAndChatId(chatUserCql.getUserEmail(), chatUserCql.getChatId());
+                userChatRepository.delete(userChatCql);
+                chatUserRepository.delete(chatUserCql);
+            }
+
+            //chatSqlRepository.delete(chatSql);
+        }
+
         userSql2.setDeleted(true);
         userSqlRepository.save(userSql2);
         userRepository.deleteByEmail(userCql1.getEmail());
@@ -206,5 +288,12 @@ public class ChatTests {
         wallSqlRepository.save(wall1);
         wall2.setDeleted(true);
         wallSqlRepository.save(wall2);
+
+        ChatSql testGroup = chatSqlRepository.findByName("test group");
+
+        ChatCql testGroupCql = chatRepository.findById(testGroup.getId());
+
+        chatRepository.delete(testGroupCql);
+        chatSqlRepository.delete(testGroup);
     }
 }
