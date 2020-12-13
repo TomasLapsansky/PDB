@@ -33,7 +33,7 @@ public class StateController {
     }
 
     @Transactional
-    @DeleteMapping("/state/delete")
+    @PostMapping("/state/delete")
     public void deleteState(@RequestParam Long stateId) {
 
         assert stateId != null;

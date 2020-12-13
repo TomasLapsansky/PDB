@@ -3,8 +3,8 @@ create or replace table chat
 	id bigint auto_increment
 		primary key,
 	name varchar(32) null,
-	created_at timestamp default current_timestamp() not null,
-	updated_at timestamp default current_timestamp() not null,
+	created_at timestamp(3) default current_timestamp() not null,
+	updated_at timestamp(3) default current_timestamp() not null,
 	deleted tinyint(1) default 0 null
 );
 
@@ -13,8 +13,8 @@ create or replace table state
 	id int auto_increment
 		primary key,
 	name varchar(64) not null,
-	created_at timestamp default current_timestamp() not null,
-	updated_at timestamp default current_timestamp() not null,
+	created_at timestamp(3) default current_timestamp() not null,
+	updated_at timestamp(3) default current_timestamp() not null,
 	deleted tinyint(1) default 0 null
 );
 
@@ -22,8 +22,8 @@ create or replace table wall
 (
 	id bigint auto_increment
 		primary key,
-	created_at timestamp default current_timestamp() not null,
-	updated_at timestamp default current_timestamp() not null,
+	created_at timestamp(3) default current_timestamp() not null,
+	updated_at timestamp(3) default current_timestamp() not null,
 	deleted tinyint(1) default 0 null
 );
 
@@ -35,8 +35,8 @@ create or replace table page
 	admin_id bigint not null,
 	profile_photo_id bigint null,
 	wall_id bigint not null,
-	created_at timestamp default current_timestamp() not null,
-	updated_at timestamp default current_timestamp() not null,
+	created_at timestamp(3) default current_timestamp() not null,
+	updated_at timestamp(3) default current_timestamp() not null,
 	deleted tinyint(1) default 0 null,
 	constraint fk_page_wall_id
 		foreign key (wall_id) references wall (id)
@@ -49,8 +49,8 @@ create or replace table photo
 	path varchar(256) not null,
 	user_id bigint not null,
 	page_id bigint not null,
-	created_at timestamp default current_timestamp() not null,
-	updated_at timestamp default current_timestamp() not null,
+	created_at timestamp(3) default current_timestamp() not null,
+	updated_at timestamp(3) default current_timestamp() not null,
 	deleted tinyint(1) default 0 null,
 	constraint fk_photo_page_id
 		foreign key (page_id) references page (id)
@@ -74,8 +74,8 @@ create or replace table user
 	city varchar(32) null,
 	state_id int null,
 	wall_id bigint not null,
-	created_at timestamp default current_timestamp() not null,
-	updated_at timestamp default current_timestamp() not null,
+	created_at timestamp(3) default current_timestamp() not null,
+	updated_at timestamp(3) default current_timestamp() not null,
 	deleted tinyint(1) default 0 null,
 	constraint fk_user_profile_photo_id
 		foreign key (profile_photo_id) references photo (id),
@@ -92,8 +92,8 @@ create or replace table message
 	content text not null,
 	author_id bigint not null,
 	chat_id bigint not null,
-	created_at timestamp default current_timestamp() not null,
-	updated_at timestamp default current_timestamp() not null,
+	created_at timestamp(3) default current_timestamp() not null,
+	updated_at timestamp(3) default current_timestamp() not null,
 	deleted tinyint(1) default 0 null,
 	constraint fk_message_author_id
 		foreign key (author_id) references user (id),
@@ -137,8 +137,8 @@ create or replace table comment
 	user_id bigint null,
 	page_id bigint null,
 	post_id bigint not null,
-	created_at timestamp default current_timestamp() not null,
-	updated_at timestamp default current_timestamp() not null,
+	created_at timestamp(3) default current_timestamp() not null,
+	updated_at timestamp(3) default current_timestamp() not null,
 	deleted tinyint(1) default 0 null,
 	constraint fk_comment_page_id
 		foreign key (page_id) references page (id),
@@ -154,8 +154,8 @@ create or replace table comment_like
 		primary key,
 	user_id bigint not null,
 	comment_id bigint not null,
-	created_at timestamp default current_timestamp() not null,
-	updated_at timestamp default current_timestamp() not null,
+	created_at timestamp(3) default current_timestamp() not null,
+	updated_at timestamp(3) default current_timestamp() not null,
 	deleted tinyint(1) default 0 null,
 	constraint fk_comment_like_comment_id
 		foreign key (comment_id) references comment (id),
@@ -169,8 +169,8 @@ create or replace table post_like
 		primary key,
 	user_id bigint not null,
 	post_id bigint not null,
-	created_at timestamp default current_timestamp() not null,
-	updated_at timestamp default current_timestamp() not null,
+	created_at timestamp(3) default current_timestamp() not null,
+	updated_at timestamp(3) default current_timestamp() not null,
 	deleted tinyint(1) default 0 null,
 	constraint fk_post_like_post_id
 		foreign key (post_id) references post (id),
@@ -185,8 +185,8 @@ create or replace table profile_link_dictionary
 	path varchar(128) not null,
 	page_id bigint null,
 	user_id bigint null,
-	created_at timestamp default current_timestamp() not null,
-	updated_at timestamp default current_timestamp() not null,
+	created_at timestamp(3) default current_timestamp() not null,
+	updated_at timestamp(3) default current_timestamp() not null,
 	deleted tinyint(1) default 0 null,
 	constraint fk_pld_page_id
 		foreign key (page_id) references page (id),
@@ -201,8 +201,8 @@ create or replace table subscribed_to
 	subscriber_id bigint not null,
 	subscribed_to_user bigint null,
 	subscribed_to_page bigint null,
-	created_at timestamp default current_timestamp() not null,
-	updated_at timestamp default current_timestamp() not null,
+	created_at timestamp(3) default current_timestamp() not null,
+	updated_at timestamp(3) default current_timestamp() not null,
 	deleted tinyint(1) default 0 null,
 	constraint fk_subscribed_to_subscribed_to_page
 		foreign key (subscribed_to_page) references page (id),
@@ -218,8 +218,8 @@ create or replace table user_chat
 		primary key,
 	user_id bigint not null,
 	chat_id bigint not null,
-	created_at timestamp default current_timestamp() not null,
-	updated_at timestamp default current_timestamp() not null,
+	created_at timestamp(3) default current_timestamp() not null,
+	updated_at timestamp(3) default current_timestamp() not null,
 	deleted tinyint(1) default 0 null,
 	constraint fk_user_chat_chat_id
 		foreign key (chat_id) references chat (id),
@@ -234,8 +234,8 @@ create or replace table user_page
 	user_id bigint not null,
 	page_id bigint not null,
 	is_admin tinyint(1) default 1 null,
-	created_at timestamp default current_timestamp() not null,
-	updated_at timestamp default current_timestamp() not null,
+	created_at timestamp(3) default current_timestamp() not null,
+	updated_at timestamp(3) default current_timestamp() not null,
 	deleted tinyint(1) default 0 null,
 	constraint fk_user_page_page_id
 		foreign key (page_id) references page (id),

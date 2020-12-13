@@ -103,14 +103,24 @@ public class UserQueryController {
         assert profileDictionaryCql != null;
 
         UserCql userCql = userRepository.findByEmail(profileDictionaryCql.getUser_email());
+        if (userCql == null) {
+            UserSql userSql = userSqlRepository.findByEmail(profileDictionaryCql.getUser_email());
+            assert userSql != null;
+            return userDtoConverter.userSqlToDetail(userSql);
+        }
 
         return userDtoConverter.userCqlToDetail(userCql);
 
     }
 
-    @GetMapping("/users")
-    public List<UserCql> getUsers() {
+    @GetMapping("/users/active")
+    public List<UserCql> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    @GetMapping("/users/all")
+    public List<UserSql> getActiveUsers() {
+        return userSqlRepository.findAll();
     }
 
 }

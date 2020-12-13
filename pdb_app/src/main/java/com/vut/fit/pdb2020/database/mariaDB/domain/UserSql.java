@@ -1,6 +1,9 @@
 package com.vut.fit.pdb2020.database.mariaDB.domain;
 
+import com.vut.fit.pdb2020.database.dto.UserCreateDto;
+import com.vut.fit.pdb2020.database.mariaDB.repository.StateSqlRepository;
 import org.hibernate.annotations.Where;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
