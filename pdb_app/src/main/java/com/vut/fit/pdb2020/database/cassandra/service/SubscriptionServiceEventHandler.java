@@ -122,7 +122,7 @@ class SubscriptionServiceEventHandlerImpl implements SubscriptionServiceEventHan
         List<FollowerCql> followersCql = followerRepository.findAllByUserEmail(subscriptionDto.getUserEmail());
 
         for (FollowerCql followerCql : followersCql) {
-            if (followerCql.getFollower_id().equals(subscriptionDto.getIsFollowedId()))
+            if (followerCql.getFollower_id() != null && followerCql.getFollower_id().equals(subscriptionDto.getIsFollowedId()))
                 followerRepository.deleteByUserEmailAndCreatedAt(followerCql.getUser_email(), followerCql.getCreated_at());
         }
 

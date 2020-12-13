@@ -68,6 +68,7 @@ public class UserQueryController {
 
         userCql.setLast_active(Instant.now());
         userCql.setStatus(true);
+        userRepository.save(userCql);
 
         return "Logged in!";
     }

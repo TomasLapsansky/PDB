@@ -47,10 +47,10 @@ create or replace table photo
 	id bigint auto_increment
 		primary key,
 	path varchar(256) not null,
-	user_id bigint not null,
-	page_id bigint not null,
-	created_at timestamp(3) default current_timestamp() not null,
-	updated_at timestamp(3) default current_timestamp() not null,
+	user_id bigint,
+	page_id bigint,
+	created_at timestamp(3) default current_timestamp(),
+	updated_at timestamp(3) default current_timestamp(),
 	deleted tinyint(1) default 0 null,
 	constraint fk_photo_page_id
 		foreign key (page_id) references page (id)
