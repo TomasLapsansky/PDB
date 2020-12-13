@@ -55,6 +55,8 @@ public class PageQueryController {
 
         ProfileDictionaryCql profileDictionaryCql = profileDictionaryRepository.findByPath(profilePath);
 
+        assert profileDictionaryCql != null;
+
         id = profileDictionaryCql.getPage_id();
 
         PageDetailDto pageDetailDto = null;
@@ -69,14 +71,6 @@ public class PageQueryController {
 
             PageSql pageSql = pageSqlRepository.findById(id);
             assert pageSql != null;
-
-            pageCql = new PageCql();
-
-            pageCql.setName(pageSql.getName());
-            pageCql.setAdmin_email(pageSql.getAdmin().getEmail());
-            pageCql.setProfile_path(pageSql.getProfilePath());
-            pageCql.setProfile_photo_path(pageSql.getProfilePhotoPath());
-            pageRepository.save(pageCql);
 
             pageDetailDto = pageDtoConverter.sqlToDetail(pageSql);
         }

@@ -19,11 +19,12 @@ create type if not exists comment (
 	created_at timestamp
 );
 
-create table if not exists chat(
-    id bigint primary key,
-    name text,
-    updated_at timestamp
-);
+create table if not exists chat
+(
+	id bigint primary key,
+	name text,
+	updated_at timestamp
+)
 with caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
 	and compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
 	and compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
@@ -32,10 +33,23 @@ with caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
 create table if not exists chat_message
 (
 	chat_id bigint,
-    	from_user text,
-    	created_at timestamp,
-    	message text,
-    	PRIMARY KEY (chat_id, from_user, created_at)
+	from_user text,
+	created_at timestamp,
+	message text,
+	primary key (chat_id, from_user, created_at)
+)
+with caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+	and compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+	and compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+	and dclocal_read_repair_chance = 0.1
+    and default_time_to_live = 172800;
+
+create table if not exists chat_user
+(
+	chat_id bigint,
+	user_email text,
+	created_at timestamp,
+	primary key (chat_id, user_email)
 )
 with caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
 	and compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
@@ -119,21 +133,14 @@ with caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
 create table if not exists user_chat
 (
 	user_email text,
-    	chat_id bigint,
-    	created_at timestamp,
-    	PRIMARY KEY (user_email, chat_id)
+	chat_id bigint,
+	created_at timestamp,
+	primary key (user_email, chat_id)
 )
 with caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
 	and compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
 	and compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
 	and dclocal_read_repair_chance = 0.1;
-
-create table if not exists chat_user(
-    	chat_id bigint,
-    	user_email text,
-    	created_at timestamp,
-    	PRIMARY KEY (chat_id, user_email)
-);
 
 create table if not exists user_follower
 (
@@ -176,4 +183,3 @@ with caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
 	and compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
 	and dclocal_read_repair_chance = 0.1
     and default_time_to_live = 604800;
-

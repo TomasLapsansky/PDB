@@ -7,7 +7,6 @@ import com.vut.fit.pdb2020.database.cassandra.domain.UserCql;
 import com.vut.fit.pdb2020.database.cassandra.repository.PageRepository;
 import com.vut.fit.pdb2020.database.cassandra.repository.ProfileDictionaryRepository;
 import com.vut.fit.pdb2020.database.cassandra.repository.UserRepository;
-import com.vut.fit.pdb2020.database.dto.UserCreateDto;
 import com.vut.fit.pdb2020.database.dto.UserDetailDto;
 import com.vut.fit.pdb2020.database.mariaDB.domain.PageSql;
 import com.vut.fit.pdb2020.database.mariaDB.domain.ProfileDictionarySql;
@@ -21,12 +20,11 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -34,14 +32,16 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.Arrays;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class SubscriptionTests {
+public class PostTests {
 
     @Autowired
     private MockMvc mvc;
@@ -71,28 +71,24 @@ public class SubscriptionTests {
     ProfileDictionarySqlRepository profileDictionarySqlRepository;
 
     UserSql userSql1;
-    UserSql userSql2;
     UserCql userCql1;
-    UserCql userCql2;
     PageSql pageSql;
     PageCql pageCql;
     WallSql wall1;
-    WallSql wall2;
     WallSql wall3;
     ProfileDictionarySql profile1;
-    ProfileDictionarySql profile2;
     ProfileDictionarySql profile3;
     ProfileDictionaryCql profileCql1;
-    ProfileDictionaryCql profileCql2;
     ProfileDictionaryCql profileCql3;
+
+    private String userPostCreatedAt;
+    private String pagePostCreatedAt;
 
     @BeforeAll
     public void init() {
 
         wall1 = new WallSql();
         wall1 = wallSqlRepository.save(wall1);
-        wall2 = new WallSql();
-        wall2 = wallSqlRepository.save(wall2);
 
         userSql1 = new UserSql();
         userSql1.setEmail("user1@nonexist");
@@ -103,24 +99,11 @@ public class SubscriptionTests {
         userSql1.setWall(wall1);
         userSqlRepository.save(userSql1);
 
-        userSql2 = new UserSql();
-        userSql2.setEmail("user2@nonexist");
-        userSql2.setName("empty");
-        userSql2.setSurname("useress");
-        userSql2.setPassword_hash("pass");
-        userSql2.setGender("F");
-        userSql2.setWall(wall2);
-        userSqlRepository.save(userSql2);
-
         userCql1 = new UserCql();
         userCql1.setEmail("user1@nonexist");
         userCql1.setProfile_path(userSql1.getProfilePath());
         userCql1 = userRepository.save(userCql1);
 
-        userCql2 = new UserCql();
-        userCql2.setEmail("user2@nonexist");
-        userCql2.setProfile_path(userSql2.getProfilePath());
-        userCql2 = userRepository.save(userCql2);
 
         wall3 = new WallSql();
         wall3 = wallSqlRepository.save(wall3);
@@ -142,11 +125,6 @@ public class SubscriptionTests {
         profile1.setPath(userSql1.getProfilePath());
         profile1 = profileDictionarySqlRepository.save(profile1);
 
-        profile2 = new ProfileDictionarySql();
-        profile2.setUser(userSql2);
-        profile2.setPath(userSql2.getProfilePath());
-        profile2 = profileDictionarySqlRepository.save(profile2);
-
         profile3 = new ProfileDictionarySql();
         profile3.setPage(pageSql);
         profile3.setPath(pageSql.getProfilePath());
@@ -157,11 +135,6 @@ public class SubscriptionTests {
         profileCql1.setUser_email(userSql1.getEmail());
         profileDictionaryRepository.save(profileCql1);
 
-        profileCql2 = new ProfileDictionaryCql();
-        profileCql2.setProfile_path(userSql2.getProfilePath());
-        profileCql2.setUser_email(userSql2.getEmail());
-        profileDictionaryRepository.save(profileCql2);
-
         profileCql3 = new ProfileDictionaryCql();
         profileCql3.setProfile_path(pageSql.getProfilePath());
         profileCql3.setPage_id(pageSql.getId());
@@ -170,29 +143,30 @@ public class SubscriptionTests {
 
     @Test
     @Order(1)
-    public void subscribeToUser() throws Exception {
+    public void postAsUser() throws Exception {
 
-        MvcResult result = mvc.perform(post("/subscribe/user").accept(MediaType.ALL)
+        MvcResult result = mvc.perform(post("/user/post/create").accept(MediaType.ALL)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .content(EntityUtils.toString(new UrlEncodedFormEntity(Arrays.asList(
-                        new BasicNameValuePair("email", "user1@nonexist"),
-                        new BasicNameValuePair("subscribes", "user2@nonexist")
+                        new BasicNameValuePair("email", userSql1.getEmail()),
+                        new BasicNameValuePair("contentType", "text"),
+                        new BasicNameValuePair("textContent", "Test post")
                 ))))).andExpect(status().isOk()).andReturn();
 
         assertThat(NumberUtils.isCreatable(result.getResponse().getContentAsString())).isTrue();
-
-        Thread.sleep(2000);
 
     }
 
     @Test
     @Order(2)
-    public void subscribeToPage() throws Exception {
-        MvcResult result = mvc.perform(post("/subscribe/page")
+    public void postAsPage() throws Exception {
+
+        MvcResult result = mvc.perform(post("/page/post/create").accept(MediaType.ALL)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .content(EntityUtils.toString(new UrlEncodedFormEntity(Arrays.asList(
-                        new BasicNameValuePair("email", "user1@nonexist"),
-                        new BasicNameValuePair("subscribes", pageCql.getId().toString())
+                        new BasicNameValuePair("pageId", pageSql.getId().toString()),
+                        new BasicNameValuePair("contentType", "text"),
+                        new BasicNameValuePair("textContent", "Test page post")
                 ))))).andExpect(status().isOk()).andReturn();
 
         assertThat(NumberUtils.isCreatable(result.getResponse().getContentAsString())).isTrue();
@@ -202,81 +176,113 @@ public class SubscriptionTests {
 
     @Test
     @Order(3)
-    public void getSubscribers() throws Exception {
-        String profileSlug = String.format("%s%s.%d", userSql2.getName(), userSql2.getSurname(), userSql2.getId()).toLowerCase();
+    public void getUserProfilePost() throws Exception {
 
-        MvcResult result = mvc.perform(get("/subscribers/user/{slug}", profileSlug)
-                ).andExpect(status().isOk()).andReturn();
+        String profileSlug = String.format("%s%s.%d", userSql1.getName(), userSql1.getSurname(), userSql1.getId()).toLowerCase();
 
+        MvcResult result = mvc.perform(
+                get("/user/{profileSlug}", profileSlug).accept(MediaType.ALL))
+                .andExpect(status().isOk())
+                .andReturn();
 
         String resultString = result.getResponse().getContentAsString();
+        assertThat(resultString.contains("Test post")).isTrue();
 
-        assertThat(resultString.contains(String.format("%s %s", userCql1.getName(), userCql1.getSurname()))).isTrue();
-        assertThat(resultString.contains(String.format("%s %s", userCql2.getName(), userCql2.getSurname()))).isTrue();
+        JSONObject jsonObject = new JSONObject(resultString);
+        JSONArray posts = jsonObject.getJSONArray("posts");
+        JSONObject post = posts.getJSONObject(0);
+        userPostCreatedAt = post.getString("createdAt");
     }
 
     @Test
     @Order(4)
-    public void getPageSubscribers() throws Exception {
+    public void getPageProfilePosts() throws Exception {
 
         String profileSlug = String.format("%s.%d", pageSql.getName(), pageSql.getId()).toLowerCase();
 
-        MvcResult result = mvc.perform(get("/subscribers/page/{slug}", profileSlug)
-                ).andExpect(status().isOk()).andReturn();
+        MvcResult result = mvc.perform(
+                get("/page/{profileSlug}", profileSlug).accept(MediaType.ALL))
+                .andExpect(status().isOk())
+                .andReturn();
 
         String resultString = result.getResponse().getContentAsString();
+        assertThat(resultString.contains("Test page post")).isTrue();
 
-        assertThat(resultString.contains(String.format("%s %s", userCql1.getName(), userCql1.getSurname()))).isTrue();
-        assertThat(resultString.contains(pageCql.getName())).isTrue();
-
+        JSONObject jsonObject = new JSONObject(resultString);
+        JSONArray posts = jsonObject.getJSONArray("posts");
+        JSONObject post = posts.getJSONObject(0);
+        pagePostCreatedAt = post.getString("createdAt");
     }
 
     @Test
     @Order(5)
-    public void getSubscribedTo() throws Exception {
-        String profileSlug = String.format("%s%s.%d", userSql1.getName(), userSql1.getSurname(), userSql1.getId()).toLowerCase();
+    public void deleteUserPost() throws Exception {
 
-        MvcResult result = mvc.perform(get("/subscribed-to/{slug}", profileSlug)
-                ).andExpect(status().isOk()).andReturn();
+        mvc.perform(post("/user/post/delete").accept(MediaType.ALL)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .content(EntityUtils.toString(new UrlEncodedFormEntity(Arrays.asList(
+                        new BasicNameValuePair("email", userSql1.getEmail()),
+                        new BasicNameValuePair("contentType", "text"),
+                        new BasicNameValuePair("createdAt", userPostCreatedAt)
+                ))))).andExpect(status().isOk());
 
-        String resultString = result.getResponse().getContentAsString();
 
-        assertThat(resultString.contains(String.format("%s %s", userCql2.getName(), userCql2.getSurname()))).isTrue();
-        assertThat(resultString.contains(pageCql.getName())).isTrue();
     }
 
     @Test
     @Order(6)
-    public void unsubscribeUser() throws Exception {
-        mvc.perform(post("/unsubscribe/user")
+    public void deletePagePost() throws Exception {
+
+       mvc.perform(post("/page/post/delete").accept(MediaType.ALL)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .content(EntityUtils.toString(new UrlEncodedFormEntity(Arrays.asList(
-                        new BasicNameValuePair("userEmail", "user1@nonexist"),
-                        new BasicNameValuePair("unsubscribeFromEmail", "user2@nonexist")
+                        new BasicNameValuePair("pageId", pageSql.getId().toString()),
+                        new BasicNameValuePair("contentType", "text"),
+                        new BasicNameValuePair("createdAt", pagePostCreatedAt)
                 ))))).andExpect(status().isOk());
+
 
     }
 
     @Test
     @Order(7)
-    public void unsubscribePage() throws Exception {
-       mvc.perform(post("/unsubscribe/page")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content(EntityUtils.toString(new UrlEncodedFormEntity(Arrays.asList(
-                        new BasicNameValuePair("email", "user1@nonexist"),
-                        new BasicNameValuePair("pageId", pageCql.getId().toString())
-                ))))).andExpect(status().isOk());
+    public void checkUserPostDeleted() throws Exception {
 
+        String profileSlug = String.format("%s%s.%d", userSql1.getName(), userSql1.getSurname(), userSql1.getId()).toLowerCase();
+
+        MvcResult result = mvc.perform(
+                get("/user/{profileSlug}", profileSlug).accept(MediaType.ALL))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String resultString = result.getResponse().getContentAsString();
+        assertThat(resultString.contains("Test post")).isFalse();
+
+    }
+
+    @Test
+    @Order(8)
+    public void checkPagePostDeleted() throws Exception {
+
+        String profileSlug = String.format("%s.%d", pageSql.getName(), pageSql.getId()).toLowerCase();
+
+        MvcResult result = mvc.perform(
+                get("/page/{profileSlug}", profileSlug).accept(MediaType.ALL))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String resultString = result.getResponse().getContentAsString();
+        assertThat(resultString.contains("Test page post")).isFalse();
+
+        Thread.sleep(2000);
     }
 
     @AfterAll
     public void cleanUp() {
         profileDictionarySqlRepository.delete(profile1);
-        profileDictionarySqlRepository.delete(profile2);
         profileDictionarySqlRepository.delete(profile3);
 
         profileDictionaryRepository.deleteByPath(userSql1.getProfilePath());
-        profileDictionaryRepository.deleteByPath(userSql2.getProfilePath());
         profileDictionaryRepository.deleteByPath(pageSql.getProfilePath());
 
         pageSql.setDeleted(true);
@@ -285,15 +291,10 @@ public class SubscriptionTests {
         userSql1 = userSqlRepository.findByEmail(userSql1.getEmail());
         userSql1.setDeleted(true);
         userSqlRepository.save(userSql1);
-        userSql2 = userSqlRepository.findByEmail(userSql2.getEmail());
-        userSql2.setDeleted(true);
-        userSqlRepository.save(userSql2);
+
         userRepository.deleteByEmail(userCql1.getEmail());
-        userRepository.deleteByEmail(userCql2.getEmail());
         wall1.setDeleted(true);
         wallSqlRepository.save(wall1);
-        wall2.setDeleted(true);
-        wallSqlRepository.save(wall2);
         wall3.setDeleted(true);
         wallSqlRepository.save(wall3);
     }

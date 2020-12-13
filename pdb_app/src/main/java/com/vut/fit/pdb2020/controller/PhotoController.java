@@ -89,7 +89,7 @@ public class PhotoController {
     }
 
     @Transactional
-    @DeleteMapping("/photo/delete")
+    @PostMapping("/photo/delete")
     public void deletePhoto(@RequestParam String path) {
         File toDelete = new File(path);
         if  (toDelete.delete()) {

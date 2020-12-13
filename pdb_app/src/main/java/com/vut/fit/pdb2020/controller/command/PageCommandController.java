@@ -130,7 +130,7 @@ public class PageCommandController {
     }
 
     @Transactional
-    @DeleteMapping("/page/profilePic")
+    @PostMapping("/page/profilePic/delete")
     public void pageRemoveProfilePic(@RequestParam Long id) {
 
         assert id != null;

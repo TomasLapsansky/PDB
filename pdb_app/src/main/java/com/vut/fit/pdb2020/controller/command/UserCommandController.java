@@ -6,12 +6,11 @@ import com.vut.fit.pdb2020.database.cassandra.domain.UserCql;
 import com.vut.fit.pdb2020.database.cassandra.repository.ProfileDictionaryRepository;
 import com.vut.fit.pdb2020.database.cassandra.repository.UserRepository;
 import com.vut.fit.pdb2020.database.dto.UserCreateDto;
+import com.vut.fit.pdb2020.database.dto.UserServiceDto;
 import com.vut.fit.pdb2020.database.dto.converter.UserDtoConverter;
-import com.vut.fit.pdb2020.database.mariaDB.domain.PhotoSql;
-import com.vut.fit.pdb2020.database.mariaDB.domain.ProfileDictionarySql;
-import com.vut.fit.pdb2020.database.mariaDB.domain.UserSql;
-import com.vut.fit.pdb2020.database.mariaDB.domain.WallSql;
+import com.vut.fit.pdb2020.database.mariaDB.domain.*;
 import com.vut.fit.pdb2020.database.mariaDB.repository.*;
+import com.vut.fit.pdb2020.database.mariaDB.service.UserService;
 import com.vut.fit.pdb2020.utils.FileUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -53,6 +52,15 @@ public class UserCommandController {
 
     @Autowired
     ProfileDictionarySqlRepository profileDictionarySqlRepository;
+
+    @Autowired
+    private StateSqlRepository stateSqlRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    UserService userService;
 
     @Autowired
     FileUtility fileUtility;
@@ -103,7 +111,60 @@ public class UserCommandController {
         return userSql.getId();
     }
 
-    @DeleteMapping("/user/delete")
+    @Transactional
+    @PostMapping("/user/update")
+    public void updateUser(@RequestBody String userJson) throws Exception {
+
+        UserCreateDto userCreateDto = jsonObjectMapper.readValue(userJson, UserCreateDto.class);
+
+        UserSql userSql = userSqlRepository.findByEmail(userCreateDto.getEmail());
+        assert userSql != null;
+
+        ProfileDictionarySql profileDictionarySql = profileDictionarySqlRepository.findByPath(userSql.getProfilePath());
+
+        StateSql stateSql = stateSqlRepository.findById(userCreateDto.getStateId());
+
+        Instant now = Instant.now();
+
+        userSql.setName(userCreateDto.getName());
+        userSql.setSurname(userCreateDto.getSurname());
+        userSql.setGender(userCreateDto.getGender());
+        userSql.setAddress(userCreateDto.getAddress());
+        userSql.setCity(userCreateDto.getCity());
+        userSql.setUpdated_at(now);
+        userSql.setState(stateSql);
+
+        profileDictionarySql.setPath(userSql.getProfilePath());
+        profileDictionarySql.setUpdated_at(now);
+        profileDictionarySqlRepository.save(profileDictionarySql);
+
+        UserServiceDto userServiceDto = new UserServiceDto(userSql);
+
+        userService.updateUser(userServiceDto);
+
+    }
+
+    @Transactional
+    @PostMapping("/user/pass")
+    public void changePassword(@RequestParam String email, @RequestParam String password) throws Exception {
+        assert email != null && password != null;
+
+        UserSql user = userSqlRepository.findByEmail(email);
+        assert user != null;
+
+        user.setPassword_hash(passwordEncoder.encode(password));
+        user.setUpdated_at(Instant.now());
+        userSqlRepository.save(user);
+
+        UserServiceDto userServiceDto = new UserServiceDto();
+        userServiceDto.setId(user.getId());
+        userServiceDto.setEmail(email);
+        userServiceDto.setPassword_hash(user.getPassword_hash());
+
+        userService.changePassword(userServiceDto);
+    }
+
+    @PostMapping("/user/delete")
     public String deleteUser(@RequestParam String email) {
 
         UserSql userSql = userSqlRepository.findByEmail(email);
@@ -115,7 +176,8 @@ public class UserCommandController {
         userSql.setUpdated_at(Instant.now());
         userSqlRepository.save(userSql);
 
-        userRepository.deleteByEmail(email);
+        UserServiceDto userServiceDto = new UserServiceDto(userSql);
+        userService.deleteUser(userServiceDto);
 
         return "User deleted";
     }

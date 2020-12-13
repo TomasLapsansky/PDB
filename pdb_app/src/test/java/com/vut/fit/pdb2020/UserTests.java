@@ -15,8 +15,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -134,7 +136,7 @@ public class UserTests {
     public void getUsers() throws Exception {
 
         MvcResult result = mvc.perform(
-                get("/users").accept(MediaType.ALL))
+                get("/users/active").accept(MediaType.ALL))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -147,22 +149,19 @@ public class UserTests {
     @Order(7)
     public void deleteUser() throws Exception {
 
-        mvc.perform(delete("/user/delete")
+        mvc.perform(post("/user/delete")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .content(EntityUtils.toString(new UrlEncodedFormEntity(Arrays.asList(
                         new BasicNameValuePair("email", userCreateDto.getEmail())
                 ))))).andExpect(status().isOk());
 
-        mvc.perform(
-                get("/user/{profileSlug}", this.userProfileSlug).accept(MediaType.ALL))
-                .andExpect(status().isOk());
     }
 
     @Test
     @Order(8)
     public void deleteState() throws Exception {
 
-        mvc.perform(delete("/state/delete")
+        mvc.perform(post("/state/delete")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .content(EntityUtils.toString(new UrlEncodedFormEntity(Arrays.asList(
                         new BasicNameValuePair("stateId", userCreateDto.getStateId().toString())

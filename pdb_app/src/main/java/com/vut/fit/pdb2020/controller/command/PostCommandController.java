@@ -66,7 +66,7 @@ public class PostCommandController {
 
     @Transactional
     @PostMapping("/user/post/create")
-    public String createUserPost(@RequestParam String email, @RequestParam String contentType, @RequestParam String textContent) throws Exception {
+    public Long createUserPost(@RequestParam String email, @RequestParam String contentType, @RequestParam String textContent) throws Exception {
 
         assert email != null && contentType != null;
 
@@ -79,17 +79,16 @@ public class PostCommandController {
             postDto.setContentType(contentType);
             postDto.setTextContent(textContent);
 
-            postService.createPost(postDto);
+            return postService.createPost(postDto);
 
-            return "Post successfully created";
         }
 
-        return "Post creation failed";
+        throw new Exception("Wrong content type");
 
     }
 
     @Transactional
-    @DeleteMapping("/user/post/delete")
+    @PostMapping("/user/post/delete")
     public void deleteUserPost(@RequestParam String email, @RequestParam String contentType, @RequestParam String createdAt) {
 
         assert email != null && contentType != null && createdAt != null;
@@ -106,7 +105,7 @@ public class PostCommandController {
 
     @Transactional
     @PostMapping("/page/post/create")
-    public String createPagePost(@RequestParam Long pageId, @RequestParam String contentType, @RequestParam String textContent) throws Exception {
+    public Long createPagePost(@RequestParam Long pageId, @RequestParam String contentType, @RequestParam String textContent) throws Exception {
 
         assert pageId != null && contentType != null;
 
@@ -119,12 +118,11 @@ public class PostCommandController {
             postDto.setContentType(contentType);
             postDto.setTextContent(textContent);
 
-            postService.createPost(postDto);
+            return postService.createPost(postDto);
 
-            return "Post successfully created";
         }
 
-        return "Post creation failed";
+        throw new Exception("Wrong content type");
 
     }
 
